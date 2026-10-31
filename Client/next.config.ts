@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  images: { remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com' }] },
+  async rewrites() {
+    return [{ source: '/api/:path*', destination: `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000'}/:path*` }];
+  },
   turbopack: {
     rules: {
       "*.css": {
