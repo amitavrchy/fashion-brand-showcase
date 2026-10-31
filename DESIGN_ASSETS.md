@@ -1,8 +1,27 @@
 # Photography for the visual redesign
 
-All 28 new photographs were generated with the built-in `image_gen` tool, using the imagegen skill. Final files are saved in `Client/public/images/`, encoded as WebP with Sharp without cropping. These are illustrative concept photographs, not evidence of real commercial products or locations.
+The original 28 new photographs were generated with the built-in `image_gen` tool, using the imagegen skill. The homepage revision adds the three compositions below. Final files are saved in `Client/public/images/`, encoded as WebP with Sharp without cropping. These are illustrative concept photographs, not evidence of real commercial products or locations.
 
 The frontend uses intrinsic image dimensions and native aspect ratios. Desktop and mobile campaigns have separate compositions; product photographs use 3:4 portrait compositions. No artificial letterbox backgrounds are added. Generated garment photographs show complete silhouettes. Unrelated starter gallery images were removed; administrators can upload additional genuine product views.
+
+## Homepage photography and proportions
+
+This revision restores large, native-ratio photography. The campaign uses panoramic desktop, landscape tablet and full-width portrait mobile versions. Collection photographs share a 3:4 frame. Material and journal photographs use matching landscape proportions. The homepage has one explicit type hierarchy: 72 / 44 / 28 / 16 / 14px on desktop, and 44 / 34 / 24 / 15 / 14px on mobile. Decorative spacing is reduced without reducing photographs to thumbnails.
+
+All three additional assets use the built-in `image_gen` tool; WebP encoding preserves the complete generated compositions.
+
+- `Client/public/images/hero-coast-wide.webp` — edited from `hero-coast.webp`.
+- `Client/public/images/campaign-editorial-wide.webp` — edited from `campaign-editorial.webp`.
+
+Exact prompt for both panoramic edits:
+
+> Edit this exact fashion photograph into an ultra-wide premium website banner with EXACT aspect ratio 8:3 (approximately 2400 by 900). Preserve this same woman, face, hair, clothing, full pose, photographic environment and refined natural light. Extend the setting horizontally and slightly recompose the camera view to make a graceful panoramic composition. Show the COMPLETE woman from the entire top of her hair to the soles of both shoes, with at least 12 percent clear headroom and 10 percent floor below the feet. Person placed in rightmost third, body no more than 75 percent of image height. Left 50 percent contains only the existing quiet architecture for live HTML typography, no text in the photo. Keep the image richly photographic and cinematic, no blank padding, no borders, no letterboxing, no artificial blur, no distorted anatomy. Do not crop any part of her body. Do not add lettering, logos or watermarks.
+
+- `Client/public/images/home-material-study.webp` — edited from `studio-detail.webp`.
+
+Exact material-study prompt:
+
+> Edit this exact photograph into a LANDSCAPE 3:2 luxury fashion material-library editorial. Preserve the same complete stack of ivory cashmere, camel wool and cream silk, olive twig, wooden thread spool, tactile fabric textures and warm natural lighting. Recompose as a beautiful landscape tabletop still-life, with the entire stack centered and completely visible, every edge clear, generous 12 percent breathing room around all sides. Rich fine detail, elegant real plaster backdrop, gentle directional morning light and natural photographic shadows. The actual setting fills the image edge to edge. No words, no logos, no collage, no borders, no blank artificial padding. Full photographic composition, do not crop the stack.
 
 ## Campaign
 

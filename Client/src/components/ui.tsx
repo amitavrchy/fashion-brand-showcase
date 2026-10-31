@@ -13,6 +13,7 @@ export function Photo({
   priority = false,
   sizes = '(max-width: 700px) 100vw, 50vw',
   mobileSrc,
+  tabletSrc,
   onLoad,
 }: {
   src: string;
@@ -21,6 +22,7 @@ export function Photo({
   priority?: boolean;
   sizes?: string;
   mobileSrc?: string;
+  tabletSrc?: string;
   onLoad?: React.ReactEventHandler<HTMLImageElement>;
 }) {
   const dimensions = (imageDimensions as Record<string, number[]>)[src] || [1200, 1600];
@@ -34,6 +36,19 @@ export function Photo({
           alt,
           width: mobileDimensions[0],
           height: mobileDimensions[1],
+          sizes,
+        }).props
+      : undefined;
+  const tabletDimensions = tabletSrc
+    ? (imageDimensions as Record<string, number[]>)[tabletSrc] || [1600, 900]
+    : undefined;
+  const tabletProps =
+    tabletSrc && tabletDimensions
+      ? getImageProps({
+          src: tabletSrc,
+          alt,
+          width: tabletDimensions[0],
+          height: tabletDimensions[1],
           sizes,
         }).props
       : undefined;
@@ -58,15 +73,26 @@ export function Photo({
       className={`photo ${className}`}
     />
   );
-  return mobileSrc ? (
+  return mobileSrc || tabletSrc ? (
     <picture style={{ display: 'block', width: '100%' }}>
-      <source
-        media="(max-width: 600px)"
-        srcSet={mobileProps?.srcSet || mobileSrc}
-        sizes={sizes}
-        width={mobileDimensions?.[0]}
-        height={mobileDimensions?.[1]}
-      />
+      {mobileSrc && (
+        <source
+          media="(max-width: 600px)"
+          srcSet={mobileProps?.srcSet || mobileSrc}
+          sizes={sizes}
+          width={mobileDimensions?.[0]}
+          height={mobileDimensions?.[1]}
+        />
+      )}
+      {tabletSrc && (
+        <source
+          media="(min-width: 601px) and (max-width: 1000px)"
+          srcSet={tabletProps?.srcSet || tabletSrc}
+          sizes={sizes}
+          width={tabletDimensions?.[0]}
+          height={tabletDimensions?.[1]}
+        />
+      )}
       {photograph}
     </picture>
   ) : (

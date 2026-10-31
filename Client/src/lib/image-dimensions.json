@@ -11,6 +11,10 @@
     1600,
     1069
   ],
+  "/images/campaign-editorial-wide.webp": [
+    2048,
+    768
+  ],
   "/images/campaign-editorial.webp": [
     1672,
     941
@@ -43,9 +47,17 @@
     900,
     1200
   ],
+  "/images/hero-coast-wide.webp": [
+    2048,
+    768
+  ],
   "/images/hero-coast.webp": [
     1672,
     941
+  ],
+  "/images/home-material-study.webp": [
+    1400,
+    933
   ],
   "/images/knit.jpg": [
     1600,
