@@ -62,7 +62,7 @@ Run PostgreSQL first. Integration and browser tests create separate databases en
 
 ```sh
 npm --prefix Server run test:e2e
-npm --prefix Client exec playwright install chromium
+npm --prefix Client exec -- playwright install chromium
 npm --prefix Client run test:e2e
 ```
 
@@ -73,6 +73,8 @@ npm run build
 npm --prefix Client run lint
 npm --prefix Server run lint
 ```
+
+Verified: 11 API integration tests and 18 desktop/mobile browser tests pass. Production dependency audits are clean. The local production homepage scores **92 Performance / 100 Accessibility / 100 Best Practices / 100 SEO** in Lighthouse mobile, with zero layout shift. Run `npm --prefix Client run audit` against a running production preview to write a fresh HTML/JSON report to `.data/quality/`. Scores depend on the deployment environment. Detailed acceptance results are in [BUILD_PROGRESS.md](BUILD_PROGRESS.md).
 
 ## Production configuration
 

@@ -99,7 +99,7 @@ export function HomePage() {
                 key={c.id}
                 className={slide === i ? 'selected' : ''}
                 onClick={() => hero?.scrollTo(i)}
-                aria-label={`View campaign ${i + 1}`}
+                aria-label={`View campaign ${String(i + 1).padStart(2, '0')}`}
                 aria-pressed={slide === i}
               >
                 {String(i + 1).padStart(2, '0')}

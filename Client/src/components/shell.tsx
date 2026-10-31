@@ -15,7 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { api, message, money } from '@/lib/api';
 import type { Catalog } from '@/lib/types';
 import {
@@ -41,14 +41,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </main>
       <Footer />
       <CartDrawer />
-      <motion.div
-        key={pathname}
-        className="page-curtain"
-        aria-hidden
-        initial={{ scaleY: 1 }}
-        animate={{ scaleY: 0 }}
-        transition={{ duration: reduced ? 0.15 : 0.5, ease: [0.76, 0, 0.24, 1] }}
-      />
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={pathname}
+          className="page-curtain"
+          aria-hidden
+          initial={{ scaleY: 1 }}
+          animate={{ scaleY: 0 }}
+          transition={{ duration: reduced ? 0.15 : 0.5, ease: [0.76, 0, 0.24, 1] }}
+        />
+      </AnimatePresence>
     </>
   );
 }
@@ -101,7 +103,7 @@ function Header() {
           >
             {menu ? <X size={23} /> : <Menu size={23} />}
           </button>
-          <Link href="/" className="wordmark" onClick={close} aria-label="Atelier Lune home">
+          <Link href="/" className="wordmark" onClick={close}>
             ATELIER LUNE<span>PARIS · COPENHAGEN</span>
           </Link>
           <nav aria-label="Main navigation" className="desktop-nav">
