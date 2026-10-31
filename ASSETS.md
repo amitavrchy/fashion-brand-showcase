@@ -13,17 +13,30 @@ All runtime photographs are served from `Client/public/images`. Fonts are self-h
 
 ## Stock editorial references
 
+The responsive campaign also uses `Client/public/images/campaign-portrait.webp` and its 900px delivery version, `campaign-portrait-optimized.webp`. The portrait was edited from the generated wide campaign with built-in `image_gen` and encoded to WebP with Sharp. Full composition is preserved; CSS uses `object-fit: contain` and disables hover zoom cropping.
+
+Portrait edit prompt:
+
+> Edit this ATELIER LUNE fashion editorial into a portrait 4:5 campaign photograph for a mobile website. Preserve the woman, her camel wool coat, ivory knit and espresso trousers, the limestone architecture, natural light and photographic texture. Recompose and extend the environment as needed. Show her complete body from the entire top of her hair to the soles of her shoes. Leave generous 10% clear headroom above the hair and 8% breathing room below the feet, no person or garment touching an edge. Calm full-length editorial portrait, subject centered in the full composition, beautiful natural proportions. No text, no logos, no borders. This will be displayed with object-fit contain so the entire photograph remains visible.
+
 Unsplash source image IDs (downloaded with width 1600 and quality 85):
 
-| Local asset   | Source                                                       |
-| ------------- | ------------------------------------------------------------ |
-| coat.jpg      | https://images.unsplash.com/photo-1539109136881-3be0616acf4b |
-| dress.jpg     | https://images.unsplash.com/photo-1539008835657-9e8e9680c956 |
-| knit.jpg      | https://images.unsplash.com/photo-1434389677669-e08b4cac3105 |
-| tailoring.jpg | https://images.unsplash.com/photo-1591047139829-d91aecb6caea |
-| bag.jpg       | https://images.unsplash.com/photo-1548036328-c9fa89d128fa    |
-| detail.jpg    | https://images.unsplash.com/photo-1598554747436-c9293d6a588f |
-| landscape.jpg | https://images.unsplash.com/photo-1470770841072-f978cf4d019e |
-| atelier.jpg   | https://images.unsplash.com/photo-1441986300917-64674bd600d8 |
+| Local asset      | Source                                                       |
+| ---------------- | ------------------------------------------------------------ |
+| coat.jpg         | https://images.unsplash.com/photo-1539109136881-3be0616acf4b |
+| dress.jpg        | https://images.unsplash.com/photo-1539008835657-9e8e9680c956 |
+| knit.jpg         | https://images.unsplash.com/photo-1434389677669-e08b4cac3105 |
+| tailoring.jpg    | https://images.unsplash.com/photo-1591047139829-d91aecb6caea |
+| bag.jpg          | https://images.unsplash.com/photo-1548036328-c9fa89d128fa    |
+| detail.jpg       | https://images.unsplash.com/photo-1598554747436-c9293d6a588f |
+| landscape.jpg    | https://images.unsplash.com/photo-1470770841072-f978cf4d019e |
+| atelier.jpg      | https://images.unsplash.com/photo-1441986300917-64674bd600d8 |
+| linen.jpg        | https://images.unsplash.com/photo-1596755094514-f87e34085b2c |
+| shirts.jpg       | https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf |
+| leather.jpg      | https://images.unsplash.com/photo-1551028719-00167b16eac5    |
+| studio.jpg       | https://images.unsplash.com/photo-1497366811353-6870744d04b2 |
+| architecture.jpg | https://images.unsplash.com/photo-1600210492486-724fe5c67fb0 |
+
+The five expanded editorial references were downloaded at width 1400 and quality 85. Human subjects were checked for complete heads; a cropped-head reference was rejected and is not included.
 
 Before a commercial launch, replace illustrative product and boutique photography with the brand’s actual catalog and location assets.

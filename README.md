@@ -31,6 +31,8 @@ npm run dev
 - API health: http://127.0.0.1:4000/health
 - Admin: http://localhost:3000/admin
 
+The current review preview runs at **http://localhost:3001** because port 3000 is occupied. To use that port yourself, run `npm --prefix Client run dev -- --port 3001` and include `http://localhost:3001` in `CLIENT_ORIGIN`.
+
 The Next.js server proxies `/api/*` to the API, so session cookies stay HTTP-only and same-origin. `API_URL` is a server-side environment variable. `CLIENT_ORIGIN` on the API is the exact allowed browser origin (comma-separated if several are required).
 
 ## Administrator access
@@ -47,14 +49,31 @@ Sign in through `/account`, then open `/admin`. Seeding is idempotent and preser
 
 - Editorial campaign carousel, responsive mega-menu, material-aware search and newsletter persistence.
 - Collections with URL-backed category, color, available-size filters, sorting and pagination.
-- Product images with a second-image hover, zoom, keyboard-accessible variants, size guide, stock states and fabric/care accordions.
+- Complete-frame photography on every device, a dedicated mobile campaign portrait, second-image hover, zoom, keyboard-accessible variants, size guide, stock states and fabric/care accordions.
 - Redux bag with local persistence, editable quantities and a focus-trapped drawer.
-- Validated mock checkout, authoritative server prices, shipping calculation, idempotency and transactional stock decrement.
-- Shoppable lookbook with GSAP horizontal desktop chapters, touch-friendly mobile chapters and product panels.
+- Stripe-hosted test checkout, authoritative server prices, shipping calculation, stable retry keys and transactional stock reservations. Verified payment confirms the order; cancellation/expiry releases stock exactly once.
+- Three shoppable lookbooks with thirteen chapters, GSAP horizontal desktop navigation, touch-friendly mobile chapters and product panels. Hotspots stay aligned with the complete photograph.
 - Brand story, journal filtering/articles and city-filtered store locator with map directions.
 - Registration/sign-in, HTTP-only JWT sessions, persistent authenticated wishlist and account order history.
 - Protected product/variant, collection and campaign administration. Unpublishing preserves order history.
 - Self-hosted fonts, a 14px minimum UI text size, reduced-motion support, focus states, native accessible dialogs, product JSON-LD, metadata, sitemap and robots rules.
+- 24 pieces across six collections, twelve journal stories, six concept boutiques, material guides, wardrobe advice, brand stories and detailed care/service answers.
+
+## Stripe test payments
+
+Set `STRIPE_SECRET_KEY` to your Stripe **test** secret key in ignored `Server/.env`. Existing keys are preserved. Hosted Checkout handles card entry; the application never receives card numbers, and a publishable key is not needed for this redirect flow.
+
+Keep the local webhook forwarder running in its own terminal **before starting the API**:
+
+```sh
+npm --prefix Server run stripe:listen
+```
+
+The wrapper uses the configured test key without printing it, forwards Checkout events to `http://127.0.0.1:4000/payments/webhook`, and saves the signing secret only to ignored `Server/.env`. Restart the API after the first connection or if that secret changes. No Stripe CLI login is required with the configured API key.
+
+Complete checkout with Stripe test card `4242 4242 4242 4242`, any future expiry, and any three-digit CVC. Card `4000 0000 0000 0002` exercises a declined payment. Use fictitious customer details. No real money is charged. See [Stripe's testing guide](https://docs.stripe.com/testing).
+
+The return page verifies the session with Stripe before showing success. Signed webhooks and periodic reconciliation also update orders when the browser closes. Receipt access requires the checkout browser's HTTP-only cookie or the owning account. Abandoned reservations expire after about 31 minutes and are reconciled every minute. Cancelling Checkout returns to a usable bag.
 
 ## Verification
 
@@ -66,7 +85,7 @@ npm --prefix Client exec -- playwright install chromium
 npm --prefix Client run test:e2e
 ```
 
-The browser suite starts its own API on port 4002 and Next.js on port 3003, using a separate `.next-test` directory. Its dedicated browser test database is reset when the test server starts. The test-only administrator credentials in the browser fixture are never provisioned in the development database.
+The browser suite starts its own API on port 4002 and Next.js on port 3003, using a separate `.next-test` directory. Its dedicated browser test database is reset when the test server starts. The test-only administrator credentials in the browser fixture are never provisioned in the development database. Automated suites inject a fake Stripe gateway in the test bootstrap, verify signed fixture events and never spend real funds or require Stripe credentials. The production application has no fixture payment endpoints. Real Stripe test-card payment, signed local webhook, decline and cancellation are also checked separately.
 
 ```sh
 npm run build
@@ -74,7 +93,7 @@ npm --prefix Client run lint
 npm --prefix Server run lint
 ```
 
-Verified: 11 API integration tests and 18 desktop/mobile browser tests pass. Production dependency audits are clean. The local production homepage scores **92 Performance / 100 Accessibility / 100 Best Practices / 100 SEO** in Lighthouse mobile, with zero layout shift. Run `npm --prefix Client run audit` against a running production preview to write a fresh HTML/JSON report to `.data/quality/`. Scores depend on the deployment environment. Detailed acceptance results are in [BUILD_PROGRESS.md](BUILD_PROGRESS.md).
+Verification results are recorded in [BUILD_PROGRESS.md](BUILD_PROGRESS.md). Run `npm --prefix Client run audit` against a running production preview to write a fresh HTML/JSON Lighthouse report to `.data/quality/`; set `AUDIT_URL` when the preview uses port 3001. Scores depend on the deployment environment.
 
 ## Production configuration
 
@@ -82,6 +101,8 @@ Use managed PostgreSQL, apply `npm --prefix Server run db:migrate`, provision an
 
 Build with `npm run build`; start each service with `npm --prefix Server run start:prod` and `npm --prefix Client start`. The API Dockerfile is built with `Server` as its context. Never expose the development database or its example credentials to the public internet.
 
-Checkout is intentionally a simulation: it takes no payment details, sends no email, and arranges no physical fulfilment. Newsletter signup persists the address; connecting an email provider is a future integration. Store locations, brand history and product imagery are concept content. Replace them with verified brand information before commercial launch. Asset provenance and the generated campaign prompt are in [ASSETS.md](ASSETS.md).
+Payments currently accept Stripe test keys only. For a deployed test environment, configure a Stripe endpoint at `https://<your-api>/payments/webhook` for `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`, and set that endpoint's `STRIPE_WEBHOOK_SECRET`. The CLI secret belongs only to local forwarding. Live charging requires an intentional production payment rollout.
+
+The application records test orders without arranging physical fulfilment or sending transactional emails. Newsletter signup persists the address; connecting an email provider is a future integration. Store locations, brand history and product imagery are concept content. Replace them with verified brand information before commercial launch. Asset provenance and generated campaign prompts are in [ASSETS.md](ASSETS.md).
 
 The in-memory API rate limiter is suitable for a single instance. A multi-instance deployment should share rate-limit storage and configure proxy trust for its infrastructure.
