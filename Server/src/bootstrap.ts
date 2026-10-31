@@ -19,6 +19,8 @@ export function configureApplication(app: INestApplication) {
   app.use(helmet());
   app.enableCors({ origin: origins, credentials: true });
   app.use((req: Request, res: Response, next: NextFunction) => {
+    if (/^\/(auth|wishlist|orders|payments|admin)(\/|$)/.test(req.path))
+      res.setHeader('Cache-Control', 'private, no-store');
     if (
       !['GET', 'HEAD', 'OPTIONS'].includes(req.method) &&
       req.headers.origin &&

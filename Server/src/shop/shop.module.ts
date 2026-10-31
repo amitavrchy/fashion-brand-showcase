@@ -36,6 +36,13 @@ import { PaymentsController } from './payments.controller.js';
     }),
   ],
   controllers: [ShopController, AdminController, PaymentsController],
-  providers: [ShopService, SessionService, SessionGuard, AdminGuard, StripeGateway, PaymentsService],
+  providers: [
+    ShopService,
+    SessionService,
+    SessionGuard,
+    AdminGuard,
+    StripeGateway,
+    PaymentsService,
+  ],
 })
 export class ShopModule {}

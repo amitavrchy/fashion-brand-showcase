@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { api, message, money } from '@/lib/api';
+import { api, ApiError, message, money } from '@/lib/api';
 import type { Catalog, CheckoutSession } from '@/lib/types';
 import { reconcileCart, useAppDispatch, useAppSelector } from '@/features/store';
 import { BagItems } from './shell';
@@ -161,8 +161,20 @@ export function CheckoutPage() {
   const submit = useMutation({
     mutationFn: (values: CheckoutValues) => {
       const { email, ...shipping } = values;
-      const fingerprint = JSON.stringify({ values, items: items.map(i => ({ variantId: i.variantId, quantity: i.quantity })) });
-      try { const previous = JSON.parse(sessionStorage.getItem('lune-checkout-attempt') || 'null'); key.current = previous?.fingerprint === fingerprint ? previous.key : crypto.randomUUID(); sessionStorage.setItem('lune-checkout-attempt', JSON.stringify({ fingerprint, key: key.current })); } catch { if (!key.current) key.current = crypto.randomUUID(); }
+      const fingerprint = JSON.stringify({
+        values,
+        items: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
+      });
+      try {
+        const previous = JSON.parse(sessionStorage.getItem('lune-checkout-attempt') || 'null');
+        key.current = previous?.fingerprint === fingerprint ? previous.key : crypto.randomUUID();
+        sessionStorage.setItem(
+          'lune-checkout-attempt',
+          JSON.stringify({ fingerprint, key: key.current }),
+        );
+      } catch {
+        if (!key.current) key.current = crypto.randomUUID();
+      }
       return api<CheckoutSession>('orders', {
         method: 'POST',
         body: JSON.stringify({
@@ -174,8 +186,25 @@ export function CheckoutPage() {
       });
     },
     onSuccess: (data) => {
-      try { sessionStorage.setItem('lune-active-checkout', data.sessionId); } catch { /* Payment continues without optional browser storage. */ }
+      try {
+        sessionStorage.setItem('lune-active-checkout', data.sessionId);
+      } catch {
+        /* Payment continues without optional browser storage. */
+      }
       window.location.assign(data.checkoutUrl);
+    },
+    onError: (error) => {
+      if (
+        error instanceof ApiError &&
+        ['CHECKOUT_REJECTED', 'CHECKOUT_CLOSED'].includes(error.code || '')
+      ) {
+        key.current = '';
+        try {
+          sessionStorage.removeItem('lune-checkout-attempt');
+        } catch {
+          /* Optional browser storage. */
+        }
+      }
     },
   });
   if (!items.length)
@@ -197,11 +226,11 @@ export function CheckoutPage() {
       </div>
       <div className="checkout-layout">
         <div>
-          <div className="mock-note">
+          <div className="payment-note">
             <ShieldCheck size={20} />
             <span>
-              Stripe test mode. Your payment details are entered securely on Stripe. No real
-              funds are charged, and your pieces are reserved while you complete payment.
+              Stripe test mode. Your payment details are entered securely on Stripe. No real funds
+              are charged, and your pieces are reserved while you complete payment.
             </span>
           </div>
           <form
@@ -335,7 +364,7 @@ export function CheckoutPage() {
               className="button"
               disabled={submit.isPending || !catalog.isSuccess || hasStockIssue}
             >
-              {submit.isPending ? 'Recording your order…' : 'Place mock order'}
+              {submit.isPending ? 'Opening Stripe…' : 'Continue to secure payment'}
               <ArrowRight size={18} />
             </button>
           </form>

@@ -1,3 +1,5 @@
+import { Test } from '@nestjs/testing';
+import { FakeStripeGateway, signedEvent } from './fake-stripe.mjs';
 import { PrismaClient } from '@prisma/client';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
@@ -46,7 +48,31 @@ await db.productMedia.updateMany({
   data: { url: '/images/campaign-editorial.webp' },
 });
 await db.$disconnect();
-const { createApplication } = await import('../dist/bootstrap.js');
-const app = await createApplication();
+const { configureApplication } = await import('../dist/bootstrap.js');
+const { AppModule } = await import('../dist/app.module.js');
+const { StripeGateway } = await import('../dist/shop/stripe.gateway.js');
+const fakeStripe = new FakeStripeGateway();
+const module = await Test.createTestingModule({ imports: [AppModule] })
+  .overrideProvider(StripeGateway)
+  .useValue(fakeStripe)
+  .compile();
+const app = configureApplication(
+  module.createNestApplication({ rawBody: true, logger: false }),
+);
+app
+  .getHttpAdapter()
+  .getInstance()
+  .post('/__test/pay/:sessionId', async (req, res) => {
+    try {
+      const session = await fakeStripe.pay(req.params.sessionId);
+      const { payload, signature } = signedEvent(session);
+      const { PaymentsService } =
+        await import('../dist/shop/payments.service.js');
+      await app.get(PaymentsService).webhook(Buffer.from(payload), signature);
+      res.json({ url: session.success_url });
+    } catch {
+      res.status(500).json({ message: 'Test fixture failed.' });
+    }
+  });
 await app.listen(4002, '127.0.0.1');
 console.log('Browser test API ready on port 4002 (isolated test database).');

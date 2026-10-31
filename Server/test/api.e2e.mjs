@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { PrismaClient } from '@prisma/client';
+import { Test } from '@nestjs/testing';
+import { FakeStripeGateway, signedEvent } from './fake-stripe.mjs';
+const fakeStripe = new FakeStripeGateway();
 
 const originalUrl = process.env.DATABASE_URL;
 assert.ok(
@@ -80,8 +83,16 @@ const orderData = (items, extra = {}) => ({
   ...extra,
 });
 before(async () => {
-  const { createApplication } = await import('../dist/bootstrap.js');
-  app = await createApplication();
+  const { configureApplication } = await import('../dist/bootstrap.js');
+  const { AppModule } = await import('../dist/app.module.js');
+  const { StripeGateway } = await import('../dist/shop/stripe.gateway.js');
+  const module = await Test.createTestingModule({ imports: [AppModule] })
+    .overrideProvider(StripeGateway)
+    .useValue(fakeStripe)
+    .compile();
+  app = configureApplication(
+    module.createNestApplication({ rawBody: true, logger: false }),
+  );
   await app.listen(0, '127.0.0.1');
   base = await app.getUrl();
   catalog = (await call('catalog')).data;
@@ -102,20 +113,20 @@ after(async () => {
   await db.$disconnect();
   await app?.close();
 });
-test('seeded public catalog, lookbook, stores and journal resolve with their relations', async () => {
+void test('seeded public catalog, lookbook, stores and journal resolve with their relations', async () => {
   assert.ok(catalog.products.length >= 8);
   assert.ok(catalog.collections.length >= 3);
   assert.ok(catalog.campaigns.length >= 2);
   assert.ok(catalog.products.every((p) => p.variants.length && p.media.length));
   assert.equal((await call('products/the-sculpted-coat')).status, 200);
   const look = await call('lookbooks/a-study-in-stillness');
-  assert.equal(look.data.chapters.length, 3);
+  assert.equal(look.data.chapters.length, 5);
   assert.ok(look.data.chapters[0].hotspots[0].product.slug);
-  assert.equal((await call('stores')).data.length, 3);
-  assert.equal((await call('journal')).data.length, 3);
+  assert.equal((await call('stores')).data.length, 6);
+  assert.equal((await call('journal')).data.length, 12);
   assert.equal((await call('products/missing-piece')).status, 404);
 });
-test('validation rejects missing shipping, unknown fields and invalid newsletter emails', async () => {
+void test('validation rejects missing shipping, unknown fields and invalid newsletter emails', async () => {
   const { shipping: _, ...invalid } = orderData([
     { variantId: 'p-coat-0-0', quantity: 1 },
   ]);
@@ -149,7 +160,7 @@ test('validation rejects missing shipping, unknown fields and invalid newsletter
     400,
   );
 });
-test('accounts use HTTP-only sessions, prevent privilege escalation, and protect administrator routes', async () => {
+void test('accounts use HTTP-only sessions, prevent privilege escalation, and protect administrator routes', async () => {
   assert.equal((await call('admin')).status, 401);
   const registration = await call('auth/register', {
     method: 'POST',
@@ -199,7 +210,7 @@ test('accounts use HTTP-only sessions, prevent privilege escalation, and protect
   adminCookie = admin.cookie;
   assert.equal((await call('admin', { cookie: adminCookie })).status, 200);
 });
-test('authenticated wishlist survives a fresh sign-in and can remove saved pieces', async () => {
+void test('authenticated wishlist survives a fresh sign-in and can remove saved pieces', async () => {
   assert.equal(
     (await call('wishlist/p-coat', { method: 'PUT', cookie: customerCookie }))
       .status,
@@ -229,7 +240,7 @@ test('authenticated wishlist survives a fresh sign-in and can remove saved piece
     0,
   );
 });
-test('cross-origin mutations are rejected and security headers are present', async () => {
+void test('cross-origin mutations are rejected and security headers are present', async () => {
   assert.equal(
     (
       await call('newsletter', {
@@ -245,7 +256,7 @@ test('cross-origin mutations are rejected and security headers are present', asy
     'nosniff',
   );
 });
-test('newsletter signup is idempotent', async () => {
+void test('newsletter signup is idempotent', async () => {
   assert.equal(
     (await call('newsletter', { method: 'POST', data: { email } })).status,
     201,
@@ -256,7 +267,7 @@ test('newsletter signup is idempotent', async () => {
   );
   assert.equal(await db.newsletterSubscriber.count({ where: { email } }), 1);
 });
-test('checkout calculates authoritative prices, decrements stock once, and links signed-in orders', async () => {
+void test('checkout calculates authoritative prices, decrements stock once, and links signed-in orders', async () => {
   const variantId = 'p-coat-0-0';
   const beforeStock = (
     await db.variant.findUnique({ where: { id: variantId } })
@@ -296,7 +307,7 @@ test('checkout calculates authoritative prices, decrements stock once, and links
     409,
   );
 });
-test('out-of-stock line rolls back earlier stock decrements in the same order', async () => {
+void test('out-of-stock line rolls back earlier stock decrements in the same order', async () => {
   const variantId = 'p-coat-0-1';
   const beforeStock = (
     await db.variant.findUnique({ where: { id: variantId } })
@@ -314,7 +325,7 @@ test('out-of-stock line rolls back earlier stock decrements in the same order', 
     beforeStock,
   );
 });
-test('two simultaneous orders for the final item produce one order and never negative stock', async () => {
+void test('two simultaneous orders for the final item produce one order and never negative stock', async () => {
   const variantId = 'p-knit-0-0';
   await db.variant.update({ where: { id: variantId }, data: { stock: 1 } });
   const attempts = await Promise.all([
@@ -342,7 +353,7 @@ test('two simultaneous orders for the final item produce one order and never neg
     'Orders below €300 include €15 shipping.',
   );
 });
-test('duplicate variants are merged and aggregate quantity limits cannot be bypassed', async () => {
+void test('duplicate variants are merged and aggregate quantity limits cannot be bypassed', async () => {
   const response = await call('orders', {
     method: 'POST',
     data: orderData([
@@ -352,7 +363,7 @@ test('duplicate variants are merged and aggregate quantity limits cannot be bypa
   });
   assert.equal(response.status, 400);
 });
-test('administrator product, collection and campaign CRUD remains reflected in the catalog', async () => {
+void test('administrator product, collection and campaign CRUD remains reflected in the catalog', async () => {
   const collection = await call('admin/collections', {
     method: 'POST',
     cookie: adminCookie,
@@ -447,5 +458,201 @@ test('administrator product, collection and campaign CRUD remains reflected in t
       })
     ).status,
     200,
+  );
+});
+
+async function deliverEvent(session, type) {
+  const event = signedEvent(session, type);
+  const response = await fetch(`${base}/payments/webhook`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'stripe-signature': event.signature,
+    },
+    body: event.payload,
+  });
+  return { status: response.status, data: await response.json() };
+}
+void test('unsigned payment webhooks are rejected', async () => {
+  assert.equal(
+    (
+      await call('payments/webhook', {
+        method: 'POST',
+        data: { type: 'checkout.session.completed' },
+      })
+    ).status,
+    400,
+  );
+});
+void test('only verified paid sessions confirm an order; duplicate webhooks never decrement twice', async () => {
+  const variantId = 'p-shirt-0-0';
+  const beforeStock = (
+    await db.variant.findUnique({ where: { id: variantId } })
+  ).stock;
+  const checkout = await call('orders', {
+    method: 'POST',
+    data: orderData([{ variantId, quantity: 1 }]),
+  });
+  assert.equal(checkout.status, 201);
+  assert.equal(
+    (await call(`payments/checkout/${checkout.data.sessionId}`)).status,
+    403,
+  );
+  const unpaid = await fakeStripe.retrieve(checkout.data.sessionId);
+  assert.equal((await deliverEvent(unpaid)).status, 200);
+  assert.equal(
+    (await db.order.findUnique({ where: { id: checkout.data.id } })).status,
+    'PENDING',
+  );
+  const paid = await fakeStripe.pay(checkout.data.sessionId);
+  assert.equal((await deliverEvent(paid)).status, 200);
+  const confirmed = await db.order.findUnique({
+    where: { id: checkout.data.id },
+  });
+  assert.equal(confirmed.status, 'PAID');
+  assert.ok(confirmed.paidAt);
+  assert.equal((await deliverEvent(paid)).status, 200);
+  assert.equal(
+    (
+      await db.order.findUnique({ where: { id: checkout.data.id } })
+    ).paidAt.getTime(),
+    confirmed.paidAt.getTime(),
+  );
+  assert.equal(
+    (await db.variant.findUnique({ where: { id: variantId } })).stock,
+    beforeStock - 1,
+  );
+  assert.equal(
+    (
+      await call(`payments/checkout/${checkout.data.sessionId}`, {
+        cookie: checkout.cookie,
+      })
+    ).data.order.status,
+    'PAID',
+  );
+});
+void test('cancelling checkout returns stock exactly once and protects another browser', async () => {
+  const variantId = 'p-shirt-0-1';
+  const beforeStock = (
+    await db.variant.findUnique({ where: { id: variantId } })
+  ).stock;
+  const checkout = await call('orders', {
+    method: 'POST',
+    data: orderData([{ variantId, quantity: 1 }]),
+  });
+  assert.equal(
+    (await call(`payments/cancel/${checkout.data.id}`, { method: 'POST' }))
+      .status,
+    403,
+  );
+  const cancelled = await call(`payments/cancel/${checkout.data.id}`, {
+    method: 'POST',
+    cookie: checkout.cookie,
+  });
+  assert.equal(cancelled.status, 200);
+  assert.equal(cancelled.data.order.status, 'CANCELLED');
+  await call(`payments/cancel/${checkout.data.id}`, {
+    method: 'POST',
+    cookie: checkout.cookie,
+  });
+  assert.equal(
+    (await db.variant.findUnique({ where: { id: variantId } })).stock,
+    beforeStock,
+  );
+});
+void test('expired session webhooks release reservations without duplicate restocking', async () => {
+  const variantId = 'p-bag-0-0';
+  const beforeStock = (
+    await db.variant.findUnique({ where: { id: variantId } })
+  ).stock;
+  const checkout = await call('orders', {
+    method: 'POST',
+    data: orderData([{ variantId, quantity: 1 }]),
+  });
+  const expired = await fakeStripe.expire(checkout.data.sessionId);
+  assert.equal(
+    (await deliverEvent(expired, 'checkout.session.expired')).status,
+    200,
+  );
+  assert.equal(
+    (await deliverEvent(expired, 'checkout.session.expired')).status,
+    200,
+  );
+  assert.equal(
+    (await db.variant.findUnique({ where: { id: variantId } })).stock,
+    beforeStock,
+  );
+});
+void test('a mismatched Stripe amount cannot mark an order paid', async () => {
+  const checkout = await call('orders', {
+    method: 'POST',
+    data: orderData([{ variantId: 'p-shirt-0-2', quantity: 1 }]),
+  });
+  const session = await fakeStripe.pay(checkout.data.sessionId);
+  const correct = session.amount_total;
+  session.amount_total += 1;
+  assert.equal((await deliverEvent(session)).status, 409);
+  assert.equal(
+    (await db.order.findUnique({ where: { id: checkout.data.id } })).status,
+    'PENDING',
+  );
+  session.amount_total = correct;
+  assert.equal((await deliverEvent(session)).status, 200);
+});
+void test('definitively rejected session creation releases reserved stock', async () => {
+  const variantId = 'p-shirt-0-3';
+  const beforeStock = (
+    await db.variant.findUnique({ where: { id: variantId } })
+  ).stock;
+  fakeStripe.failNext = true;
+  const result = await call('orders', {
+    method: 'POST',
+    data: orderData([{ variantId, quantity: 1 }]),
+  });
+  assert.equal(result.status, 503);
+  assert.equal(
+    (await db.variant.findUnique({ where: { id: variantId } })).stock,
+    beforeStock,
+  );
+});
+void test('simultaneous checkout retries share one reservation and one Stripe session', async () => {
+  const variantId = 'p-shirt-1-0';
+  const beforeStock = (
+    await db.variant.findUnique({ where: { id: variantId } })
+  ).stock;
+  const payload = orderData([{ variantId, quantity: 1 }]);
+  const results = await Promise.all([
+    call('orders', { method: 'POST', data: payload }),
+    call('orders', { method: 'POST', data: payload }),
+  ]);
+  assert.deepEqual(
+    results.map((r) => r.status),
+    [201, 201],
+  );
+  assert.equal(results[0].data.id, results[1].data.id);
+  assert.equal(results[0].data.sessionId, results[1].data.sessionId);
+  assert.equal(
+    (await db.variant.findUnique({ where: { id: variantId } })).stock,
+    beforeStock - 1,
+  );
+});
+void test('a payment completing before cancellation remains paid and is never restocked', async () => {
+  const variantId = 'p-shirt-1-1';
+  const beforeStock = (
+    await db.variant.findUnique({ where: { id: variantId } })
+  ).stock;
+  const checkout = await call('orders', {
+    method: 'POST',
+    data: orderData([{ variantId, quantity: 1 }]),
+  });
+  await fakeStripe.pay(checkout.data.sessionId);
+  const result = await call(`payments/cancel/${checkout.data.id}`, {
+    method: 'POST',
+    cookie: checkout.cookie,
+  });
+  assert.equal(result.data.order.status, 'PAID');
+  assert.equal(
+    (await db.variant.findUnique({ where: { id: variantId } })).stock,
+    beforeStock - 1,
   );
 });

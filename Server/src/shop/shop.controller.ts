@@ -64,7 +64,18 @@ export class ShopController {
       throw new NotFoundException('This piece could not be found.');
     return product;
   }
-  @Get('lookbooks') lookbooks() { return this.db.lookbook.findMany({ select: { id: true, slug: true, title: true, coverImage: true, _count: { select: { chapters: true } } }, orderBy: { title: 'asc' } }); }
+  @Get('lookbooks') lookbooks() {
+    return this.db.lookbook.findMany({
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        coverImage: true,
+        _count: { select: { chapters: true } },
+      },
+      orderBy: { title: 'asc' },
+    });
+  }
   @Get('lookbooks/:slug') async lookbook(@Param('slug') slug: string) {
     const lookbook = await this.db.lookbook.findUnique({
       where: { slug },
@@ -223,7 +234,11 @@ export class ShopController {
   }
   @Post('orders')
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
-  async order(@Body() dto: OrderDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async order(
+    @Body() dto: OrderDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     return this.payments.begin(dto, await this.session.user(req), req, res);
   }
   @Get('orders') @UseGuards(SessionGuard) orders(@Req() req: AuthRequest) {

@@ -41,7 +41,7 @@ test('campaign carousel, responsive navigation and search work without browser e
     ).toBeVisible();
     await page.goto('/collections');
   }
-  await expect(page.locator('.catalog-grid .product-card')).toHaveCount(8);
+  await expect(page.locator('.catalog-grid .product-card')).toHaveCount(12);
   expect(errors).toEqual([]);
 });
 test('category, color, size filters and price sorting update the collection URL', async ({
@@ -50,18 +50,24 @@ test('category, color, size filters and price sorting update the collection URL'
   await page.goto('/collections');
   await page.getByRole('button', { name: /Filters/ }).click();
   await page.getByLabel('Category', { exact: true }).selectOption('Knitwear');
-  await expect(page.locator('.catalog-grid .product-card')).toHaveCount(2);
+  await expect(page.locator('.catalog-grid .product-card')).toHaveCount(5);
   await page.getByLabel('Color', { exact: true }).selectOption('Oat');
   await page.getByLabel('Available size').selectOption('M');
   await expect(page).toHaveURL(/category=Knitwear.*color=Oat.*size=M/);
   await page.getByLabel('Sort pieces').selectOption('price-high');
   await expect(page.locator('.catalog-grid .price').first()).toHaveText('€265');
   await page.getByRole('button', { name: 'Clear all filters' }).click();
-  await expect(page.locator('.catalog-grid .product-card')).toHaveCount(8);
+  await expect(page.locator('.catalog-grid .product-card')).toHaveCount(12);
 });
-test('product size guide, stock states, persistent bag and complete mock checkout', async ({
+test('product size guide, stock states, persistent bag and Stripe checkout and confirmed payment', async ({
   page,
 }, info) => {
+  await page.route('https://checkout.stripe.com/c/pay/**', async (route) => {
+    const id = new URL(route.request().url()).pathname.split('/').pop();
+    const paid = await page.request.post(`http://127.0.0.1:4002/__test/pay/${id}`);
+    const data = await paid.json();
+    await route.fulfill({ status: 302, headers: { location: data.url }, body: '' });
+  });
   await page.goto('/product/the-sculpted-coat');
   await expect(
     page.getByRole('button', { name: 'Size XL, out of stock', exact: true }),
@@ -82,7 +88,7 @@ test('product size guide, stock states, persistent bag and complete mock checkou
   await page.reload();
   await expect(page.locator('.cart-layout .bag-item')).toHaveCount(1);
   await page.locator('.order-summary').getByRole('link', { name: 'Continue to checkout' }).click();
-  await page.getByRole('button', { name: 'Place mock order' }).click();
+  await page.getByRole('button', { name: 'Continue to secure payment' }).click();
   await expect(page.getByText('Please enter a valid email address.')).toBeVisible();
   await page
     .getByLabel('Email address', { exact: true })
@@ -93,9 +99,9 @@ test('product size guide, stock states, persistent bag and complete mock checkou
   await page.getByLabel('City', { exact: true }).fill('Paris');
   await page.getByLabel('Postal code').fill('75003');
   await page.getByLabel('Country', { exact: true }).selectOption('France');
-  await page.getByRole('button', { name: 'Place mock order' }).click();
+  await page.getByRole('button', { name: 'Continue to secure payment' }).click();
   await expect(page.locator('h1')).toHaveText('Beautifully chosen.');
-  await expect(page.getByText('Mock order · Pending', { exact: true })).toBeVisible();
+  await expect(page.getByText('Payment confirmed', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Open bag, 0 items' })).toBeVisible();
 });
 test('account registration, saved pieces and wishlist persistence after sign out', async ({
@@ -138,8 +144,11 @@ test('lookbook hotspots open a product panel, journal articles and store filters
   await expect(page).toHaveURL(/product\/the-sculpted-coat/);
   await page.goto('/journal');
   await page.getByRole('button', { name: 'Craft & process', exact: true }).click();
-  await expect(page.locator('.journal-grid .journal-card')).toHaveCount(1);
-  await page.locator('.journal-grid .journal-card').click();
+  await expect(page.locator('.journal-grid .journal-card')).toHaveCount(3);
+  await page
+    .locator('.journal-grid .journal-card')
+    .filter({ hasText: 'A material connection' })
+    .click();
   await expect(page.locator('h1')).toHaveText('A material connection');
   await page.goto('/stores');
   await page.getByRole('button', { name: 'Paris', exact: true }).click();
@@ -188,6 +197,7 @@ test('all main pages fit the viewport and every visible text element is at least
   for (const path of [
     '/',
     '/collections',
+    '/lookbook',
     '/product/the-cashmere-crew',
     '/about',
     '/journal',

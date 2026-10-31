@@ -73,7 +73,11 @@ export type Order = {
   };
   createdAt: string;
 };
-export type CheckoutSession = Order & { sessionId: string; checkoutUrl: string; paymentMode: 'test' };
+export type CheckoutSession = Order & {
+  sessionId: string;
+  checkoutUrl: string;
+  paymentMode: 'test';
+};
 export type JournalPost = {
   id: string;
   slug: string;
