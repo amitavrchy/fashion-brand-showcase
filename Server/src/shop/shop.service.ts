@@ -36,7 +36,7 @@ export class ShopService {
     return { products, collections, campaigns };
   }
 
-  async placeOrder(dto: OrderDto, user: SessionUser | null) {
+  async placeOrder(dto: OrderDto, user: SessionUser | null, checkout?: { origin: string }) {
     const email = dto.email.trim().toLowerCase();
     if (user && user.email !== email)
       throw new BadRequestException(
@@ -118,6 +118,7 @@ export class ShopService {
             email,
             userId: user?.id,
             status: 'PENDING',
+            ...(checkout ? { paymentProvider: 'STRIPE', checkoutOrigin: checkout.origin, expiresAt: new Date(Date.now() + 31 * 60_000) } : {}),
             total: (subtotalCents + shippingCents) / 100,
             itemsJson: items,
             shippingJson: {

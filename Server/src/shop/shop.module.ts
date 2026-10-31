@@ -5,6 +5,9 @@ import { PrismaModule } from '../prisma/prisma.module.js';
 import { AdminController, ShopController } from './shop.controller.js';
 import { AdminGuard, SessionGuard, SessionService } from './auth.js';
 import { ShopService } from './shop.service.js';
+import { StripeGateway } from './stripe.gateway.js';
+import { PaymentsService } from './payments.service.js';
+import { PaymentsController } from './payments.controller.js';
 
 @Module({
   imports: [
@@ -32,7 +35,7 @@ import { ShopService } from './shop.service.js';
       },
     }),
   ],
-  controllers: [ShopController, AdminController],
-  providers: [ShopService, SessionService, SessionGuard, AdminGuard],
+  controllers: [ShopController, AdminController, PaymentsController],
+  providers: [ShopService, SessionService, SessionGuard, AdminGuard, StripeGateway, PaymentsService],
 })
 export class ShopModule {}

@@ -1,14 +1,14 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { api, message, money } from '@/lib/api';
-import type { Catalog, Order } from '@/lib/types';
-import { clearCart, reconcileCart, useAppDispatch, useAppSelector } from '@/features/store';
+import type { Catalog, CheckoutSession } from '@/lib/types';
+import { reconcileCart, useAppDispatch, useAppSelector } from '@/features/store';
 import { BagItems } from './shell';
 import { EmptyState, Photo } from './ui';
 
@@ -139,12 +139,9 @@ function OrderSummary({
 export function CheckoutPage() {
   const items = useAppSelector((s) => s.cart.items);
   const user = useAppSelector((s) => s.auth.user);
-  const dispatch = useAppDispatch();
   const catalog = useCartCatalog();
   const hasStockIssue = items.some((i) => i.stock < i.quantity);
-  const queryClient = useQueryClient();
   const key = useRef('');
-  const [order, setOrder] = useState<Order | null>(null);
   const form = useForm<CheckoutValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -163,9 +160,10 @@ export function CheckoutPage() {
   }, [user, form]);
   const submit = useMutation({
     mutationFn: (values: CheckoutValues) => {
-      if (!key.current) key.current = crypto.randomUUID();
       const { email, ...shipping } = values;
-      return api<Order>('orders', {
+      const fingerprint = JSON.stringify({ values, items: items.map(i => ({ variantId: i.variantId, quantity: i.quantity })) });
+      try { const previous = JSON.parse(sessionStorage.getItem('lune-checkout-attempt') || 'null'); key.current = previous?.fingerprint === fingerprint ? previous.key : crypto.randomUUID(); sessionStorage.setItem('lune-checkout-attempt', JSON.stringify({ fingerprint, key: key.current })); } catch { if (!key.current) key.current = crypto.randomUUID(); }
+      return api<CheckoutSession>('orders', {
         method: 'POST',
         body: JSON.stringify({
           email: user?.email || email,
@@ -176,58 +174,10 @@ export function CheckoutPage() {
       });
     },
     onSuccess: (data) => {
-      setOrder(data);
-      dispatch(clearCart());
-      queryClient.invalidateQueries({ queryKey: ['catalog'] });
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['product'] });
+      try { sessionStorage.setItem('lune-active-checkout', data.sessionId); } catch { /* Payment continues without optional browser storage. */ }
+      window.location.assign(data.checkoutUrl);
     },
   });
-  if (order)
-    return (
-      <div className="order-confirmation">
-        <CheckCircle2 size={48} strokeWidth={1} />
-        <p className="eyebrow">A little anticipation</p>
-        <h1>
-          Beautifully <em>chosen.</em>
-        </h1>
-        <p>
-          Your mock order has been recorded and inventory reserved. No payment was taken. Keep the
-          reference below for your records.
-        </p>
-        <div className="confirmation-details">
-          <h3>Order details</h3>
-          <div className="summary-row">
-            <span>Reference</span>
-            <strong>{order.id}</strong>
-          </div>
-          <div className="summary-row">
-            <span>Email</span>
-            <span>{order.email}</span>
-          </div>
-          <div className="summary-row">
-            <span>Status</span>
-            <span>Mock order · Pending</span>
-          </div>
-          {order.itemsJson.map((i) => (
-            <div className="summary-row" key={i.variantId}>
-              <span>
-                {i.name} · {i.size} × {i.quantity}
-              </span>
-              <span>{money(i.price * i.quantity)}</span>
-            </div>
-          ))}
-          <div className="summary-row total">
-            <span>Total</span>
-            <span>{money(order.total)}</span>
-          </div>
-        </div>
-        <Link className="button" href={user ? '/account' : '/collections'}>
-          {user ? 'View your orders' : 'Continue exploring'}
-          <ArrowRight size={18} />
-        </Link>
-      </div>
-    );
   if (!items.length)
     return (
       <EmptyState
@@ -250,8 +200,8 @@ export function CheckoutPage() {
           <div className="mock-note">
             <ShieldCheck size={20} />
             <span>
-              This is a demonstration checkout. No payment information is requested and no charge
-              will be made. Placing an order updates inventory.
+              Stripe test mode. Your payment details are entered securely on Stripe. No real
+              funds are charged, and your pieces are reserved while you complete payment.
             </span>
           </div>
           <form
@@ -349,11 +299,11 @@ export function CheckoutPage() {
             </div>
             <h2>03 / A considered next step</h2>
             <p className="muted">
-              By placing this mock order, you agree to our{' '}
+              By continuing to secure payment, you agree to our{' '}
               <Link className="text-link" href="/terms">
                 terms
               </Link>
-              . Delivery and returns shown here are illustrative.
+              . Your pieces are reserved while you complete payment.
             </p>
             {submit.isError && (
               <p className="form-error" role="alert">

@@ -44,6 +44,14 @@ const cart = createSlice({
       state.items = [];
       state.open = false;
     },
+    consumeOrder(state, action: PayloadAction<{ variantId: string; quantity: number }[]>) {
+      for (const purchased of action.payload) {
+        const line = state.items.find(i => i.variantId === purchased.variantId);
+        if (line) line.quantity -= purchased.quantity;
+      }
+      state.items = state.items.filter(i => i.quantity > 0);
+      state.open = false;
+    },
     setCartOpen(state, action: PayloadAction<boolean>) {
       state.open = action.payload;
     },
@@ -80,6 +88,7 @@ export const {
   setQuantity,
   removeItem,
   clearCart,
+  consumeOrder,
   setCartOpen,
 } = cart.actions;
 export const { setWishlist, toggleWishlist } = wishlist.actions;

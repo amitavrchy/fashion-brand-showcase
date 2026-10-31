@@ -121,6 +121,14 @@ model Order {
   itemsJson      Json
   shippingJson   Json
   idempotencyKey String      @unique
+  paymentProvider String    @default("MOCK")
+  stripeSessionId String?   @unique
+  stripePaymentIntentId String? @unique
+  checkoutUrl    String?
+  checkoutOrigin String?
+  expiresAt      DateTime?
+  stockReleasedAt DateTime?
+  paidAt         DateTime?
   createdAt      DateTime    @default(now())
 }
 

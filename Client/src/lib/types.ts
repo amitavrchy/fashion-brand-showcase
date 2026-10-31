@@ -54,6 +54,10 @@ export type CartLine = {
   stock: number;
 };
 export type Order = {
+  paymentProvider?: string;
+  stripeSessionId?: string | null;
+  checkoutUrl?: string | null;
+  paidAt?: string | null;
   id: string;
   email: string;
   status: string;
@@ -69,6 +73,7 @@ export type Order = {
   };
   createdAt: string;
 };
+export type CheckoutSession = Order & { sessionId: string; checkoutUrl: string; paymentMode: 'test' };
 export type JournalPost = {
   id: string;
   slug: string;

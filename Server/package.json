@@ -5,7 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "overrides": { "deepmerge-ts": "^8.0.0" },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0"
+  },
   "type": "module",
   "scripts": {
     "build": "nest build",
@@ -19,6 +21,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "node --env-file=.env prisma/seed.mjs",
+    "stripe:listen": "node --env-file=.env scripts/stripe-listen.mjs",
     "lint": "oxlint --type-aware src/ test/",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -43,13 +46,15 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "stripe": "^23.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^12.0.0",
     "@nestjs/mau": "^0.2.6",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.1",
+    "@stripe/cli": "^1.55.6",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/node": "^24.0.0",

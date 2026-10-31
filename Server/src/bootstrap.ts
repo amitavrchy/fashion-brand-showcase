@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module.js';
@@ -7,8 +7,12 @@ import { DatabaseExceptionFilter } from './shop/database.filter.js';
 
 export async function createApplication() {
   const app = await NestFactory.create(AppModule, {
+    rawBody: true,
     logger: process.env.NODE_ENV === 'test' ? false : ['error', 'warn', 'log'],
   });
+  return configureApplication(app);
+}
+export function configureApplication(app: INestApplication) {
   const origins = (process.env.CLIENT_ORIGIN ?? 'http://localhost:3000')
     .split(',')
     .map((s) => s.trim());
