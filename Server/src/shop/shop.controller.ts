@@ -8,6 +8,7 @@ import { AdminGuard, publicUser, SessionGuard, SessionService } from './auth.js'
 import type { AuthRequest } from './auth.js';
 import { CampaignDto, CollectionDto, EmailDto, LoginDto, OrderDto, ProductDto, RegisterDto } from './dto.js';
 import { productInclude, ShopService } from './shop.service.js';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller()
 export class ShopController {
@@ -31,7 +32,7 @@ export class ShopController {
     if (!post || post.publishedAt > new Date()) throw new NotFoundException('Article not found.');
     return post;
   }
-  @Post('newsletter') async newsletter(@Body() dto: EmailDto) {
+  @Post('newsletter') @Throttle({ default: { limit: 5, ttl: 60_000 } }) async newsletter(@Body() dto: EmailDto) {
     await this.db.newsletterSubscriber.upsert({ where: { email: dto.email.toLowerCase() }, create: { email: dto.email.toLowerCase() }, update: {} });
     return { message: 'You’re on the list. A little inspiration, from time to time.' };
   }
@@ -40,7 +41,7 @@ export class ShopController {
     res.cookie('lune_session', token, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 7 * 24 * 60 * 60 * 1000 });
     return user;
   }
-  @Post('auth/register') async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+  @Post('auth/register') @Throttle({ default: { limit: 10, ttl: 60_000 } }) async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     try {
       const user = await this.db.user.create({ data: { email: dto.email.trim().toLowerCase(), name: dto.name.trim(), passwordHash: await bcrypt.hash(dto.password, 12) }, select: publicUser });
       return this.signIn(user, res);
@@ -49,7 +50,7 @@ export class ShopController {
       throw e;
     }
   }
-  @Post('auth/login') @HttpCode(200) async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+  @Post('auth/login') @HttpCode(200) @Throttle({ default: { limit: 10, ttl: 60_000 } }) async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const user = await this.db.user.findUnique({ where: { email: dto.email.trim().toLowerCase() } });
     const valid = await bcrypt.compare(dto.password, user?.passwordHash ?? '$2b$12$JZyBS0kGZhN33CzRQqszP.khjZPkbIr2JfJl6B77S8ZXj.BnMHWaG');
     if (!user || !valid) throw new UnauthorizedException('Email or password is incorrect.');
@@ -67,7 +68,7 @@ export class ShopController {
     return this.db.wishlistItem.upsert({ where: { userId_productId: { userId: req.user.id, productId } }, create: { userId: req.user.id, productId }, update: {} });
   }
   @Delete('wishlist/:productId') @UseGuards(SessionGuard) removeWish(@Req() req: AuthRequest, @Param('productId') productId: string) { return this.db.wishlistItem.deleteMany({ where: { userId: req.user.id, productId } }); }
-  @Post('orders') async order(@Body() dto: OrderDto, @Req() req: Request) { return this.shop.placeOrder(dto, await this.session.user(req)); }
+  @Post('orders') @Throttle({ default: { limit: 20, ttl: 60_000 } }) async order(@Body() dto: OrderDto, @Req() req: Request) { return this.shop.placeOrder(dto, await this.session.user(req)); }
   @Get('orders') @UseGuards(SessionGuard) orders(@Req() req: AuthRequest) { return this.db.order.findMany({ where: { userId: req.user.id }, orderBy: { createdAt: 'desc' } }); }
 }
 

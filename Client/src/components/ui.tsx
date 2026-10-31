@@ -6,14 +6,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export function Photo({ src, alt, className = '', priority = false, sizes = '(max-width: 700px) 100vw, 50vw' }: { src: string; alt: string; className?: string; priority?: boolean; sizes?: string }) {
-  return <Image src={src} alt={alt} fill sizes={sizes} priority={priority} unoptimized={src.startsWith('https:') && !src.startsWith('https://images.unsplash.com/')} className={`photo ${className}`} />;
+  return <Image src={src} alt={alt} fill sizes={sizes} priority={priority} style={src.includes('campaign-editorial') ? { objectPosition: '78% center' } : undefined} unoptimized={src.startsWith('https:') && !src.startsWith('https://images.unsplash.com/')} className={`photo ${className}`} />;
 }
 export function ArrowLink({ href, children, className = '' }: { href: string; children: React.ReactNode; className?: string }) {
   return <Link href={href} className={`arrow-link ${className}`}><span>{children}</span><ArrowRight size={19} strokeWidth={1.4} /></Link>;
 }
 export function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const reduce = useReducedMotion();
-  return <motion.div className={className} initial={reduce ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-35px' }} transition={{ duration: .7, delay, ease: [.22, 1, .36, 1] }}>{children}</motion.div>;
+  return <motion.div className={`reveal ${className}`} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-35px' }} transition={{ duration: reduce ? 0 : .7, delay: reduce ? 0 : delay, ease: [.22, 1, .36, 1] }}>{children}</motion.div>;
 }
 export function Modal({ open, onClose, title, children, className = '' }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDialogElement>(null);

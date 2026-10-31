@@ -12,8 +12,8 @@ import { EmptyState, ErrorState, Loading, Modal, Photo } from './ui';
 export function SizeGuide() {
   return <><p className="muted">Body measurements in centimetres. Our pieces have a considered, relaxed fit. Choose your usual size; size down for a closer silhouette.</p><table className="size-table"><caption className="sr-only">International clothing size conversion and body measurements in centimetres</caption><thead><tr><th scope="col">Size</th><th scope="col">EU</th><th scope="col">Bust</th><th scope="col">Waist</th><th scope="col">Hip</th></tr></thead><tbody>{[['XS', '34', '80–84', '62–66', '86–90'], ['S', '36', '84–88', '66–70', '90–94'], ['M', '38', '88–92', '70–74', '94–98'], ['L', '40', '92–98', '74–80', '98–104'], ['XL', '42', '98–104', '80–86', '104–110']].map(row => <tr key={row[0]}><th scope="row">{row[0]}</th>{row.slice(1).map(cell => <td key={cell}>{cell}</td>)}</tr>)}</tbody></table><p className="muted">Measure around the fullest part of your bust and hips, and the narrowest point of your waist. Keep the tape comfortably level.</p><Link className="text-link" href="/client-care">Need a little guidance? Client care</Link></>;
 }
-export function ProductPage({ slug }: { slug: string }) {
-  const product = useQuery({ queryKey: ['product', slug], queryFn: () => api<Product>(`products/${slug}`) });
+export function ProductPage({ slug, initialProduct }: { slug: string; initialProduct?: Product }) {
+  const product = useQuery({ queryKey: ['product', slug], queryFn: () => api<Product>(`products/${slug}`), initialData: initialProduct });
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: () => api<Catalog>('catalog') });
   if (product.isPending) return <Loading label="A closer look…" />;
   if (product.isError) return product.error instanceof ApiError && product.error.status === 404 ? <EmptyState title="This piece has moved on." text="Discover other considered additions to your wardrobe." /> : <ErrorState retry={() => product.refetch()} />;

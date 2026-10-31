@@ -13,7 +13,7 @@ import { ArrowLink, EmptyState, Modal, Photo } from './ui';
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const reduced = useReducedMotion();
-  return <><a className="skip-link" href="#main">Skip to content</a><Header /><main id="main" tabIndex={-1}>{children}</main><Footer /><CartDrawer /><motion.div key={pathname} className="page-curtain" aria-hidden initial={reduced ? { opacity: .2 } : { scaleY: 1 }} animate={reduced ? { opacity: 0 } : { scaleY: 0 }} transition={{ duration: reduced ? .15 : .5, ease: [.76, 0, .24, 1] }} /></>;
+  return <><a className="skip-link" href="#main">Skip to content</a><Header /><main id="main" tabIndex={-1}>{children}</main><Footer /><CartDrawer /><motion.div key={pathname} className="page-curtain" aria-hidden initial={{ scaleY: 1 }} animate={{ scaleY: 0 }} transition={{ duration: reduced ? .15 : .5, ease: [.76, 0, .24, 1] }} /></>;
 }
 function Header() {
   const [menu, setMenu] = useState(false);
@@ -23,7 +23,7 @@ function Header() {
   const dispatch = useAppDispatch();
   const count = useAppSelector(s => s.cart.items.reduce((sum, i) => sum + i.quantity, 0));
   const wishes = useAppSelector(s => s.wishlist.ids.length);
-  const catalog = useQuery({ queryKey: ['catalog'], queryFn: () => api<Catalog>('catalog') });
+  const catalog = useQuery({ queryKey: ['catalog'], queryFn: () => api<Catalog>('catalog'), enabled: menu || search });
   const results = catalog.data?.products.filter(p => `${p.name} ${p.category} ${p.fabric}`.toLowerCase().includes(term.toLowerCase())).slice(0, 6) ?? [];
   const close = () => { setMenu(false); setSearch(false); };
   useEffect(() => { const handle = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenu(false); }; window.addEventListener('keydown', handle); return () => window.removeEventListener('keydown', handle); }, []);

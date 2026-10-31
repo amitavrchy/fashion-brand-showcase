@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 const db = new PrismaClient();
 const photos = {
-  coat: '/images/coat.jpg', dress: '/images/dress.jpg', knit: '/images/knit.jpg',
+  coat: '/images/campaign-editorial.webp', dress: '/images/dress.jpg', knit: '/images/knit.jpg',
   tailoring: '/images/tailoring.jpg', bag: '/images/bag.jpg', detail: '/images/detail.jpg',
   landscape: '/images/landscape.jpg', atelier: '/images/atelier.jpg',
 };
@@ -54,7 +54,8 @@ for (const store of [
   { id: 'store-london', name: 'Marylebone', city: 'London', address: '18 Marylebone High Street, London W1U 4QZ, United Kingdom', lat: 51.5206, lng: -0.1519, hours: 'Monday–Saturday 10:00–18:00 · Sunday 12:00–17:00' },
   { id: 'store-copenhagen', name: 'The Copenhagen atelier', city: 'Copenhagen', address: '12 Store Strandstræde, 1255 Copenhagen, Denmark', lat: 55.6814, lng: 12.5896, hours: 'Monday–Friday 10:00–18:00 · Saturday 10:00–16:00' },
 ]) await db.store.upsert({ where: { id: store.id }, update: {}, create: store });
-await db.campaign.upsert({ where: { id: 'campaign-aw' }, update: {}, create: { id: 'campaign-aw', title: 'The quiet\nexpression.', subtitle: 'AUTUMN / WINTER 2026', image: photos.coat, link: '/collections/autumn-winter', accent: '#5C1F1F' } });
+await db.campaign.upsert({ where: { id: 'campaign-aw' }, update: {}, create: { id: 'campaign-aw', title: 'The quiet\nexpression.', subtitle: 'AUTUMN / WINTER 2026', image: '/images/campaign-editorial.webp', link: '/collections/autumn-winter', accent: '#5C1F1F' } });
+await db.campaign.upsert({ where: { id: 'campaign-permanent' }, update: {}, create: { id: 'campaign-permanent', title: 'Less, but\nbetter.', subtitle: 'THE PERMANENT COLLECTION', image: photos.knit, link: '/collections/the-permanent-collection', accent: '#514339' } });
 if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
   if (process.env.ADMIN_PASSWORD.length < 12) throw new Error('ADMIN_PASSWORD must contain at least 12 characters.');
   await db.user.upsert({ where: { email: process.env.ADMIN_EMAIL.toLowerCase() }, update: {}, create: { email: process.env.ADMIN_EMAIL.toLowerCase(), name: 'Atelier administrator', role: 'ADMIN', passwordHash: await bcrypt.hash(process.env.ADMIN_PASSWORD, 12) } });

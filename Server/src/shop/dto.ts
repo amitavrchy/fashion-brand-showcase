@@ -1,28 +1,29 @@
-import { Type } from 'class-transformer';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsEmail, IsHexColor, IsIn, IsInt, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsDefined, IsEmail, IsHexColor, IsIn, IsInt, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested } from 'class-validator';
+const Trim = () => Transform(({ value }: { value: unknown }) => typeof value === 'string' ? value.trim() : value);
 
 export class LoginDto {
-  @IsEmail() @MaxLength(254) email: string;
+  @Trim() @IsEmail() @MaxLength(254) email: string;
   @IsString() @MinLength(8) @MaxLength(72) password: string;
 }
 export class RegisterDto extends LoginDto {
-  @IsString() @MinLength(2) @MaxLength(80) name: string;
+  @Trim() @IsString() @MinLength(2) @MaxLength(80) name: string;
 }
-export class EmailDto { @IsEmail() @MaxLength(254) email: string; }
+export class EmailDto { @Trim() @IsEmail() @MaxLength(254) email: string; }
 export class OrderLineDto {
   @IsString() @MaxLength(100) variantId: string;
   @IsInt() @Min(1) @Max(10) quantity: number;
 }
 export class ShippingDto {
-  @IsString() @MinLength(2) @MaxLength(100) name: string;
-  @IsString() @MinLength(5) @MaxLength(200) address: string;
-  @IsString() @MinLength(2) @MaxLength(100) city: string;
-  @IsString() @MinLength(2) @MaxLength(20) postalCode: string;
-  @IsString() @MinLength(2) @MaxLength(80) country: string;
+  @Trim() @IsString() @MinLength(2) @MaxLength(100) name: string;
+  @Trim() @IsString() @MinLength(5) @MaxLength(200) address: string;
+  @Trim() @IsString() @MinLength(2) @MaxLength(100) city: string;
+  @Trim() @IsString() @MinLength(2) @MaxLength(20) postalCode: string;
+  @Trim() @IsString() @MinLength(2) @MaxLength(80) country: string;
 }
 export class OrderDto extends EmailDto {
   @IsArray() @ArrayMinSize(1) @ArrayMaxSize(30) @ValidateNested({ each: true }) @Type(() => OrderLineDto) items: OrderLineDto[];
-  @ValidateNested() @Type(() => ShippingDto) shipping: ShippingDto;
+  @IsDefined() @ValidateNested() @Type(() => ShippingDto) shipping: ShippingDto;
   @IsString() @Matches(/^[a-zA-Z0-9-]{16,100}$/) idempotencyKey: string;
 }
 export class VariantDto {
