@@ -21,6 +21,7 @@ export default function Page() {
           <a href="#sizing">Finding your fit</a>
           <a href="#care">Caring for your pieces</a>
           <a href="#orders">Your orders</a>
+          <a href="#payments">Secure payments</a>
         </nav>
         <div className="care-content">
           <section id="shipping">
@@ -35,8 +36,9 @@ export default function Page() {
               unwashed, with their original tags and packaging.
             </p>
             <p>
-              This is a concept storefront. Checkout records a mock order and updates stock; no
-              payment is collected and no physical delivery is arranged.
+              This is a concept storefront with Stripe test payments. No real funds are charged and
+              no physical delivery is arranged. Delivery prices and return policies are provided to
+              demonstrate the complete shopping experience.
             </p>
           </section>
           <section id="sizing">
@@ -78,12 +80,32 @@ export default function Page() {
           <section id="orders">
             <h2>Your considered selections</h2>
             <p>
-              Sign in before placing your mock order to see it in your account. Your wishlist is
+              Sign in before beginning checkout to see your order in your account. Your wishlist is
               saved to your account when signed in, so you can return to it on another device.
             </p>
             <Link className="text-link" href="/account">
               Visit your account
             </Link>
+          </section>
+          <section id="payments">
+            <h2>Secure payment, clearly explained</h2>
+            <p>
+              Your card information is entered on Stripe’s hosted payment page and is never sent to
+              this application’s server. We reserve available stock before opening payment and
+              confirm your order after Stripe verifies success.
+            </p>
+            <p>
+              This storefront is connected to Stripe in test mode. To explore a successful test
+              payment, use card number 4242 4242 4242 4242, a future expiry date and any three-digit
+              CVC. No real funds are charged. For a test decline, Stripe provides card 4000 0000
+              0000 0002.
+            </p>
+            <p>
+              If you return from Stripe before paying, we confirm cancellation and release the
+              reserved stock. Your bag stays in place so you can choose again. An unfinished
+              checkout expires automatically; completed payments appear in your account when you
+              checked out while signed in.
+            </p>
           </section>
         </div>
       </div>

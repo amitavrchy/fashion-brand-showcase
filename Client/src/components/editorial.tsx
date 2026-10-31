@@ -63,9 +63,7 @@ export function LookbookPage({ slug }: { slug: string }) {
       <div className="lookbook-heading">
         <div>
           <p className="eyebrow">The autumn / winter 2026 lookbook</p>
-          <h1>
-            {query.data.title}
-          </h1>
+          <h1>{query.data.title}</h1>
         </div>
         <p>
           A collection between structure and softness. Scroll to explore the story; select a point
@@ -219,7 +217,7 @@ export function ArticlePage({ slug, initialPost }: { slug: string; initialPost?:
             month: 'long',
             year: 'numeric',
           }).format(new Date(post.publishedAt))}{' '}
-          · 3 minute read
+          · {Math.max(1, Math.ceil(post.body.split(/\s+/).length / 200))} minute read
         </p>
       </header>
       <div className="article-hero">

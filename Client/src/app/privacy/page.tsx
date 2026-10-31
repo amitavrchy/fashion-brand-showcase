@@ -10,13 +10,13 @@ export default function Page() {
       <div className="legal-content">
         <h2>About this storefront</h2>
         <p>
-          Atelier Lune is a demonstration fashion storefront. Account, wishlist, newsletter and mock
-          order features store data in this project’s database. No real payment processing or
-          fulfilment takes place.
+          Atelier Lune is a concept fashion storefront connected to Stripe test mode. Account,
+          wishlist, newsletter and order features store data in this project’s database. No real
+          funds are charged and no physical fulfilment takes place.
         </p>
         <h2>What is stored</h2>
         <p>
-          Creating an account stores your name, email and a securely hashed password. A mock order
+          Creating an account stores your name, email and a securely hashed password. An order
           stores your selection and the contact and shipping details you provide. Newsletter signup
           stores your email address; this application does not send marketing emails.
         </p>
@@ -34,6 +34,13 @@ export default function Page() {
           deletion requests.
         </p>
         <h2>Third-party services</h2>
+        <p>
+          Stripe processes test payments on its hosted checkout page. We send Stripe the order
+          reference, email, product names, quantities and prices. Card details are handled by Stripe
+          and are never stored in our database. We retain the checkout session reference, payment
+          status and payment reference so an order can be verified and reconciled. Stripe’s own
+          privacy policy applies to information entered on its payment page.
+        </p>
         <p>
           Product photographs are served from this application. Selecting store directions opens
           Google Maps, which has its own privacy terms. The application uses self-hosted fonts and

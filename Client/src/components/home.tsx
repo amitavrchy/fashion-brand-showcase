@@ -8,6 +8,12 @@ import { api } from '@/lib/api';
 import type { Campaign, Catalog, JournalPost } from '@/lib/types';
 import { ProductCard } from './product-card';
 import { ArrowLink, ErrorState, Photo, Reveal } from './ui';
+import {
+  CollectionStories,
+  MaterialLibrary,
+  AtelierVisit,
+  ConsideredQuestions,
+} from './brand-content';
 
 const fallback: Campaign[] = [
   {
@@ -61,7 +67,11 @@ export function HomePage() {
                 <div className="hero-photo">
                   <Photo
                     src={c.image}
-                    mobileSrc={c.image === '/images/campaign-editorial.webp' ? '/images/campaign-portrait.webp' : undefined}
+                    mobileSrc={
+                      c.image === '/images/campaign-editorial.webp'
+                        ? '/images/campaign-portrait.webp'
+                        : undefined
+                    }
                     alt="An exploration of form, movement and contemporary style"
                     priority={i === 0}
                     sizes="100vw"
@@ -130,6 +140,7 @@ export function HomePage() {
           ✳
         </span>
       </section>
+      <CollectionStories catalog={catalog.data} />
       <section id="new-season" className="featured-section section-pad">
         <Reveal className="section-heading">
           <div>
@@ -236,6 +247,7 @@ export function HomePage() {
           <span>It starts with a feeling.</span>
         </Reveal>
       </section>
+      <MaterialLibrary />
       <section className="journal-section section-pad">
         <Reveal className="section-heading">
           <div>
@@ -247,7 +259,7 @@ export function HomePage() {
           <ArrowLink href="/journal">Read all stories</ArrowLink>
         </Reveal>
         <div className="journal-grid">
-          {journal.data?.slice(0, 3).map((post, i) => (
+          {journal.data?.slice(0, 6).map((post, i) => (
             <Reveal key={post.id} delay={i * 0.08}>
               <Link className="journal-card" href={`/journal/${post.slug}`}>
                 <div className="journal-image">
@@ -268,6 +280,8 @@ export function HomePage() {
           ))}
         </div>
       </section>
+      <AtelierVisit />
+      <ConsideredQuestions />
       <section className="social-section section-pad">
         <div>
           <p className="eyebrow">An ongoing conversation</p>

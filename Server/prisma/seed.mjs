@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { seedExpandedContent } from './content.mjs';
 
 const db = new PrismaClient();
 const photos = {
@@ -378,4 +379,5 @@ if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
 console.log(
   'Seed complete: 3 collections, 8 products, 3 chapters, 3 articles, 3 stores.',
 );
+await seedExpandedContent(db);
 await db.$disconnect();

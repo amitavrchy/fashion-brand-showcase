@@ -115,10 +115,7 @@ function Header() {
             >
               Collections <Plus size={13} />
             </button>
-            <Link
-              href="/lookbook/a-study-in-stillness"
-              className={path.startsWith('/lookbook') ? 'active' : ''}
-            >
+            <Link href="/lookbook" className={path.startsWith('/lookbook') ? 'active' : ''}>
               The lookbook
             </Link>
             <Link href="/about" className={path === '/about' ? 'active' : ''}>
@@ -185,7 +182,7 @@ function Header() {
                   </Link>
                 ))}
                 <div className="mobile-nav-links">
-                  <Link href="/lookbook/a-study-in-stillness" onClick={close}>
+                  <Link href="/lookbook" onClick={close}>
                     The lookbook
                   </Link>
                   <Link href="/about" onClick={close}>
@@ -202,7 +199,7 @@ function Header() {
                   </Link>
                 </div>
               </div>
-              <Link className="menu-feature" href="/lookbook/a-study-in-stillness" onClick={close}>
+              <Link className="menu-feature" href="/lookbook" onClick={close}>
                 <Photo src="/images/coat.jpg" alt="Discover the autumn winter lookbook" />
                 <span>
                   A study in stillness <ArrowUpRight size={22} />
@@ -318,7 +315,7 @@ function Footer() {
         <div className="footer-column">
           <p className="eyebrow">Explore</p>
           <Link href="/collections">The collection</Link>
-          <Link href="/lookbook/a-study-in-stillness">The lookbook</Link>
+          <Link href="/lookbook">The lookbook</Link>
           <Link href="/about">Our philosophy</Link>
           <Link href="/journal">Journal</Link>
         </div>

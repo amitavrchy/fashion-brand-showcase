@@ -278,7 +278,13 @@ function AccountDashboard({ user }: { user: User }) {
                   </p>
                 </div>
                 <span className="status-tag">
-                  {order.status === 'PENDING' ? 'Mock order · Pending' : order.status.toLowerCase()}
+                  {order.paymentProvider === 'MOCK'
+                    ? 'Previous demo order'
+                    : order.status === 'PENDING'
+                      ? 'Awaiting payment'
+                      : order.status === 'PAID'
+                        ? 'Payment confirmed'
+                        : order.status.toLowerCase()}
                 </span>
               </div>
               {order.itemsJson.map((i) => (

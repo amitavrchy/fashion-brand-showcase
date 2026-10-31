@@ -97,7 +97,7 @@ function AdminDashboard() {
         </div>
         <div>
           <span>{data.orders.length}</span>
-          <p>Recent mock orders</p>
+          <p>Recent orders</p>
         </div>
         <div>
           <span>{data.subscriberCount}</span>
@@ -276,7 +276,7 @@ function AdminDashboard() {
       {tab === 'orders' && !data.orders.length && (
         <EmptyState
           title="A quiet start."
-          text="Mock orders will appear here as they are placed."
+          text="Orders will appear here as customers begin and complete checkout."
         />
       )}
       <Modal

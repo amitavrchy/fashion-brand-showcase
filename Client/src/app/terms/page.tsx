@@ -14,11 +14,12 @@ export default function Page() {
           boutique locations, product descriptions and commercial policies are illustrative.
           Photographs are used as editorial references and may differ from product descriptions.
         </p>
-        <h2>Mock orders</h2>
+        <h2>Orders and Stripe test payments</h2>
         <p>
-          Checkout does not request payment details or charge you. It creates an order record with a
-          pending status and updates the demonstration inventory. A mock order is not a binding sale
-          and does not arrange delivery.
+          Checkout creates an order and reserves available inventory before redirecting to Stripe’s
+          secure test payment page. An order is marked paid only after server-side payment
+          verification. Cancelled or expired payments release reserved stock. Test payments do not
+          move real funds, create a binding sale or arrange physical delivery.
         </p>
         <h2>Pricing and availability</h2>
         <p>
@@ -29,7 +30,7 @@ export default function Page() {
         <h2>Your account</h2>
         <p>
           Use a unique password and keep your sign-in details private. Please use sample shipping
-          information when exploring mock checkout. Administrative access is restricted to accounts
+          information when exploring test checkout. Administrative access is restricted to accounts
           provisioned by the project operator.
         </p>
         <h2>Using the site</h2>
