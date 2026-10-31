@@ -1,7 +1,9 @@
 {
   "name": "atelier-lune",
   "private": true,
-  "engines": { "node": ">=22.0.0" },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "setup": "node scripts/setup.mjs",
     "db": "npm --prefix Server run db:local",

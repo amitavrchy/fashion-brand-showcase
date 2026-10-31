@@ -15,15 +15,15 @@ All runtime photographs are served from `Client/public/images`. Fonts are self-h
 
 Unsplash source image IDs (downloaded with width 1600 and quality 85):
 
-| Local asset | Source |
-| --- | --- |
-| coat.jpg | https://images.unsplash.com/photo-1539109136881-3be0616acf4b |
-| dress.jpg | https://images.unsplash.com/photo-1539008835657-9e8e9680c956 |
-| knit.jpg | https://images.unsplash.com/photo-1434389677669-e08b4cac3105 |
+| Local asset   | Source                                                       |
+| ------------- | ------------------------------------------------------------ |
+| coat.jpg      | https://images.unsplash.com/photo-1539109136881-3be0616acf4b |
+| dress.jpg     | https://images.unsplash.com/photo-1539008835657-9e8e9680c956 |
+| knit.jpg      | https://images.unsplash.com/photo-1434389677669-e08b4cac3105 |
 | tailoring.jpg | https://images.unsplash.com/photo-1591047139829-d91aecb6caea |
-| bag.jpg | https://images.unsplash.com/photo-1548036328-c9fa89d128fa |
-| detail.jpg | https://images.unsplash.com/photo-1598554747436-c9293d6a588f |
+| bag.jpg       | https://images.unsplash.com/photo-1548036328-c9fa89d128fa    |
+| detail.jpg    | https://images.unsplash.com/photo-1598554747436-c9293d6a588f |
 | landscape.jpg | https://images.unsplash.com/photo-1470770841072-f978cf4d019e |
-| atelier.jpg | https://images.unsplash.com/photo-1441986300917-64674bd600d8 |
+| atelier.jpg   | https://images.unsplash.com/photo-1441986300917-64674bd600d8 |
 
 Before a commercial launch, replace illustrative product and boutique photography with the brand’s actual catalog and location assets.
