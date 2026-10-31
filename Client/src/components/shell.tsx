@@ -26,6 +26,7 @@ import {
   useAppSelector,
 } from '@/features/store';
 import { ArrowLink, EmptyState, Modal, Photo } from './ui';
+import { useSiteSettings } from '@/lib/site-settings';
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -55,6 +56,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 function Header() {
+  const settings = useSiteSettings();
   const [menu, setMenu] = useState(false);
   const [search, setSearch] = useState(false);
   const [term, setTerm] = useState('');
@@ -89,7 +91,7 @@ function Header() {
       <div className="announcement">
         <span>Considered clothing. Enduring by design.</span>
         <span>
-          Complimentary delivery on orders over €300 <ArrowUpRight size={14} />
+          {settings.announcement} <ArrowUpRight size={14} />
         </span>
       </div>
       <div className="header-shell">
@@ -200,7 +202,7 @@ function Header() {
                 </div>
               </div>
               <Link className="menu-feature" href="/lookbook" onClick={close}>
-                <Photo src="/images/coat.jpg" alt="Discover the autumn winter lookbook" />
+                <Photo src="/images/studio-coat.webp" alt="Discover the autumn winter lookbook" />
                 <span>
                   A study in stillness <ArrowUpRight size={22} />
                 </span>
@@ -254,6 +256,7 @@ function Header() {
   );
 }
 function Footer() {
+  const settings = useSiteSettings();
   const [email, setEmail] = useState('');
   const subscribe = useMutation({
     mutationFn: () =>
@@ -264,12 +267,8 @@ function Footer() {
       <div className="footer-top">
         <div className="newsletter">
           <p className="eyebrow">Letters from the atelier</p>
-          <h2>
-            A little inspiration.
-            <br />
-            <em>From time to time.</em>
-          </h2>
-          <p>New collections, considered stories, and moments worth sharing.</p>
+          <h2>{settings.newsletterTitle}</h2>
+          <p>{settings.newsletterDescription}</p>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -326,6 +325,7 @@ function Footer() {
           <Link href="/client-care#sizing">Size guide</Link>
           <Link href="/stores">Our spaces</Link>
           <Link href="/account">My account</Link>
+          <a href={`mailto:${settings.contactEmail}`}>Contact the atelier</a>
         </div>
         <div className="footer-column">
           <p className="eyebrow">Follow the story</p>

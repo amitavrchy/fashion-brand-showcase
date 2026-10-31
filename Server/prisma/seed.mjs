@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { seedExpandedContent } from './content.mjs';
+import { refreshPhotography } from './refresh-photography.mjs';
 
 const db = new PrismaClient();
 const photos = {
@@ -380,4 +381,5 @@ console.log(
   'Seed complete: 3 collections, 8 products, 3 chapters, 3 articles, 3 stores.',
 );
 await seedExpandedContent(db);
+await refreshPhotography(db);
 await db.$disconnect();

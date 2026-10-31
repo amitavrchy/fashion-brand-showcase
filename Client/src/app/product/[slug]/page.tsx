@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       ? {
           title: product.name,
           description: product.description,
-          images: [{ url: product.media[0]?.url || '/images/coat.jpg' }],
+          images: [{ url: product.media[0]?.url || '/images/studio-coat.webp' }],
         }
       : undefined,
   };

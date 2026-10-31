@@ -36,6 +36,7 @@ export type Campaign = {
   subtitle: string;
   image: string;
   link: string;
+  mobileImage?: string | null;
   accent: string;
   active: boolean;
 };

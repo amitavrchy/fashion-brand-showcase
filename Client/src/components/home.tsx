@@ -7,35 +7,34 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import type { Campaign, Catalog, JournalPost } from '@/lib/types';
 import { ProductCard } from './product-card';
+import { useSiteSettings } from '@/lib/site-settings';
 import { ArrowLink, ErrorState, Photo, Reveal } from './ui';
-import {
-  CollectionStories,
-  MaterialLibrary,
-  AtelierVisit,
-  ConsideredQuestions,
-} from './brand-content';
+import { CollectionStories, AtelierVisit, ConsideredQuestions } from './brand-content';
 
 const fallback: Campaign[] = [
   {
     id: 'intro',
-    title: 'The quiet\nexpression.',
+    title: 'The art of\nbeing you.',
     subtitle: 'AUTUMN / WINTER 2026',
-    image: '/images/campaign-editorial.webp',
+    image: '/images/hero-coast.webp',
+    mobileImage: '/images/hero-coast-mobile.webp',
     link: '/collections/autumn-winter',
-    accent: '#5C1F1F',
+    accent: '#242820',
     active: true,
   },
   {
     id: 'essentials',
     title: 'Less, but\nbetter.',
     subtitle: 'THE PERMANENT COLLECTION',
-    image: '/images/knit.jpg',
+    image: '/images/campaign-editorial.webp',
+    mobileImage: '/images/campaign-portrait-optimized.webp',
     link: '/collections/the-permanent-collection',
-    accent: '#5C1F1F',
+    accent: '#FFFDF6',
     active: true,
   },
 ];
 export function HomePage() {
+  const settings = useSiteSettings();
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: () => api<Catalog>('catalog') });
   const journal = useQuery({ queryKey: ['journal'], queryFn: () => api<JournalPost[]>('journal') });
   const [carousel, embla] = useEmblaCarousel({ align: 'start', dragFree: true });
@@ -54,7 +53,11 @@ export function HomePage() {
   const campaigns = catalog.data?.campaigns.length ? catalog.data.campaigns : fallback;
   return (
     <>
-      <section className="campaign-section" aria-label="Seasonal campaigns">
+      <section
+        className="campaign-section"
+        aria-label="Seasonal campaigns"
+        style={{ '--campaign-ink': campaigns[slide]?.accent || '#242820' } as React.CSSProperties}
+      >
         <div className="hero-viewport" ref={heroRef}>
           <div className="hero-track">
             {campaigns.map((c, i) => (
@@ -63,15 +66,12 @@ export function HomePage() {
                 key={c.id}
                 aria-roledescription="slide"
                 aria-label={`${i + 1} of ${campaigns.length}`}
+                style={{ color: c.accent }}
               >
                 <div className="hero-photo">
                   <Photo
                     src={c.image}
-                    mobileSrc={
-                      c.image === '/images/campaign-editorial.webp'
-                        ? '/images/campaign-portrait-optimized.webp'
-                        : undefined
-                    }
+                    mobileSrc={c.mobileImage || undefined}
                     alt="An exploration of form, movement and contemporary style"
                     priority={i === 0}
                     sizes="100vw"
@@ -79,20 +79,23 @@ export function HomePage() {
                 </div>
                 <div className="hero-shade" />
                 <div className="hero-content">
-                  <p
-                    className="eyebrow"
-                    style={{ borderLeft: `2px solid ${c.accent}`, paddingLeft: 12 }}
-                  >
-                    {c.subtitle}
-                  </p>
-                  <h1>
-                    {c.title.split('\n').map((line, n) => (
-                      <span key={line}>{n === 1 ? <em>{line}</em> : line}</span>
-                    ))}
-                  </h1>
-                  <p>Clothing as quiet architecture.</p>
+                  <p className="eyebrow">{c.subtitle}</p>
+                  {i === 0 ? (
+                    <h1>
+                      {c.title.split('\n').map((line, n) => (
+                        <span key={line}>{n === 1 ? <em>{line}</em> : line}</span>
+                      ))}
+                    </h1>
+                  ) : (
+                    <h2 className="hero-title">
+                      {c.title.split('\n').map((line, n) => (
+                        <span key={line}>{n === 1 ? <em>{line}</em> : line}</span>
+                      ))}
+                    </h2>
+                  )}
+                  <p>Considered pieces. An extraordinary everyday.</p>
                   <Link className="hero-link" href={c.link}>
-                    Discover the collection <ArrowUpRight size={22} strokeWidth={1.3} />
+                    Discover the collection <ArrowUpRight size={20} strokeWidth={1.4} />
                   </Link>
                 </div>
               </div>
@@ -100,7 +103,7 @@ export function HomePage() {
           </div>
         </div>
         <div className="hero-bottom">
-          <span>A new perspective on the everyday.</span>
+          <span>The new collection · Paris / Copenhagen</span>
           <a href="#new-season" aria-label="Scroll to new season pieces">
             <ArrowDown size={20} strokeWidth={1.3} />
           </a>
@@ -118,27 +121,16 @@ export function HomePage() {
             ))}
           </div>
         </div>
-        <div className="hero-side-note">FORM. FEELING. EVERYDAY.</div>
       </section>
-      <section className="intro-section section-pad">
+      <section className="wardrobe-intro section-pad">
         <Reveal>
-          <p className="eyebrow">The Atelier Lune philosophy</p>
-          <h2>
-            Not more.
-            <br />
-            <em>Just more meaningful.</em>
-          </h2>
-          <p>
-            We create pieces that feel like you. Thoughtful silhouettes,
-            <br className="desktop-break" /> exceptional materials, and a quiet confidence that
-            lasts
-            <br className="desktop-break" /> beyond a season.
-          </p>
-          <ArrowLink href="/about">Step inside our world</ArrowLink>
+          <p className="eyebrow">Atelier Lune / A considered point of view</p>
+          <h2>{settings.homeTitle}</h2>
         </Reveal>
-        <span className="intro-flower" aria-hidden>
-          ✳
-        </span>
+        <Reveal delay={0.1}>
+          <p>{settings.homeDescription}</p>
+          <ArrowLink href="/about">Our philosophy</ArrowLink>
+        </Reveal>
       </section>
       <CollectionStories catalog={catalog.data} />
       <section id="new-season" className="featured-section section-pad">
@@ -196,7 +188,7 @@ export function HomePage() {
       <section className="lookbook-teaser">
         <div className="lookbook-image">
           <Photo
-            src="/images/dress.jpg"
+            src="/images/hero-coast-mobile.webp"
             alt="An expressive silhouette from the new collection"
             sizes="(max-width: 700px) 100vw, 60vw"
           />
@@ -243,11 +235,10 @@ export function HomePage() {
           </div>
         </Reveal>
         <Reveal className="materials-photo">
-          <Photo src="/images/knit.jpg" alt="The texture and warmth of a natural knit" />
+          <Photo src="/images/studio-knit.webp" alt="The texture and warmth of a natural knit" />
           <span>It starts with a feeling.</span>
         </Reveal>
       </section>
-      <MaterialLibrary />
       <section className="journal-section section-pad">
         <Reveal className="section-heading">
           <div>
@@ -259,7 +250,7 @@ export function HomePage() {
           <ArrowLink href="/journal">Read all stories</ArrowLink>
         </Reveal>
         <div className="journal-grid">
-          {journal.data?.slice(0, 6).map((post, i) => (
+          {journal.data?.slice(0, 3).map((post, i) => (
             <Reveal key={post.id} delay={i * 0.08}>
               <Link className="journal-card" href={`/journal/${post.slug}`}>
                 <div className="journal-image">
@@ -282,49 +273,6 @@ export function HomePage() {
       </section>
       <AtelierVisit />
       <ConsideredQuestions />
-      <section className="social-section section-pad">
-        <div>
-          <p className="eyebrow">An ongoing conversation</p>
-          <h2>
-            Life in <em>Lune.</em>
-          </h2>
-          <span className="muted">Moments from the atelier, and beyond.</span>
-        </div>
-        <div className="social-grid">
-          {[
-            '/images/detail.jpg',
-            '/images/landscape.jpg',
-            '/images/bag.jpg',
-            '/images/atelier.jpg',
-          ].map((src, i) => (
-            <Link
-              key={src}
-              className="social-photo"
-              href={
-                i === 1
-                  ? '/journal/a-slower-rhythm'
-                  : i === 2
-                    ? '/collections/objects-of-affection'
-                    : '/about'
-              }
-            >
-              <Photo
-                src={src}
-                alt={
-                  [
-                    'Everyday details',
-                    'A slower rhythm in nature',
-                    'Objects of affection',
-                    'Inside the atelier',
-                  ][i]
-                }
-                sizes="25vw"
-              />
-              <ArrowUpRight size={20} />
-            </Link>
-          ))}
-        </div>
-      </section>
     </>
   );
 }

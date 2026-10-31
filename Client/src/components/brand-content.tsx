@@ -6,6 +6,14 @@ import { ArrowLink, Photo, Reveal } from './ui';
 
 export function CollectionStories({ catalog }: { catalog?: Catalog }) {
   if (!catalog) return null;
+  const featuredSlugs = ['autumn-winter', 'the-permanent-collection', 'objects-of-affection'];
+  const featured = [...catalog.collections]
+    .sort((a, b) => {
+      const rank = (slug: string) =>
+        featuredSlugs.includes(slug) ? featuredSlugs.indexOf(slug) : featuredSlugs.length;
+      return rank(a.slug) - rank(b.slug);
+    })
+    .slice(0, 3);
   return (
     <section className="collection-stories section-pad">
       <Reveal className="section-heading">
@@ -18,7 +26,7 @@ export function CollectionStories({ catalog }: { catalog?: Catalog }) {
         <ArrowLink href="/collections">Every considered piece</ArrowLink>
       </Reveal>
       <div className="collection-story-grid">
-        {catalog.collections.map((collection, index) => (
+        {featured.map((collection, index) => (
           <Reveal key={collection.id} delay={(index % 3) * 0.06}>
             <Link className="collection-story-card" href={`/collections/${collection.slug}`}>
               <div className="collection-story-image">
@@ -41,6 +49,20 @@ export function CollectionStories({ catalog }: { catalog?: Catalog }) {
             </Link>
           </Reveal>
         ))}
+      </div>
+      <div className="collection-additional">
+        {catalog.collections
+          .filter((c) => !featured.some((f) => f.id === c.id))
+          .map((collection) => (
+            <Link
+              key={collection.id}
+              className="text-link"
+              href={`/collections/${collection.slug}`}
+            >
+              {collection.title}
+              <ArrowUpRight size={17} />
+            </Link>
+          ))}
       </div>
     </section>
   );
@@ -176,7 +198,7 @@ export function ConsideredQuestions() {
           ],
           [
             'How does secure payment work?',
-            'After you enter your delivery details, we reserve available stock and take you to Stripe’s secure payment page. This storefront uses Stripe test mode, so no real funds are charged. Your order is confirmed only after Stripe verifies that payment succeeded.',
+            'After you enter your delivery details, we reserve available stock and take you to Stripe’s secure payment page. Your order is confirmed only after Stripe verifies that payment succeeded.',
           ],
           [
             'What happens if I change my mind at checkout?',
@@ -184,7 +206,7 @@ export function ConsideredQuestions() {
           ],
           [
             'What are the delivery and return details?',
-            'Our concept delivery is complimentary from €300, with a €15 flat rate below that amount. The illustrative return window is 30 days for unworn pieces with original tags. This is a concept store with test payments; physical fulfilment is not arranged.',
+            'Our concept delivery is complimentary from €300, with a €15 flat rate below that amount. The illustrative return window is 30 days for unworn pieces with original tags. Physical fulfilment is not arranged for this concept collection.',
           ],
           [
             'How can I make my pieces last?',

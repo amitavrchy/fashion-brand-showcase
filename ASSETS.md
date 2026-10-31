@@ -2,6 +2,8 @@
 
 All runtime photographs are served from `Client/public/images`. Fonts are self-hosted by `next/font` (Manrope and Cormorant Garamond). Interface icons use Lucide; the monogram is repository-native SVG.
 
+The current visual redesign adds **28 generated photographs**, including separate coastal desktop/mobile campaigns and 24 distinct product views. Saved paths and complete prompt sets are recorded in [DESIGN_ASSETS.md](DESIGN_ASSETS.md). These replace the unrelated starter product images. Photographs now flow at their native proportions, with no letterbox backgrounds; curated product frames use matching 3:4 photographs.
+
 ## Generated campaign
 
 - Asset: `Client/public/images/campaign-editorial.webp`
@@ -13,7 +15,7 @@ All runtime photographs are served from `Client/public/images`. Fonts are self-h
 
 ## Stock editorial references
 
-The responsive campaign also uses `Client/public/images/campaign-portrait.webp` and its 900px delivery version, `campaign-portrait-optimized.webp`. The portrait was edited from the generated wide campaign with built-in `image_gen` and encoded to WebP with Sharp. Full composition is preserved; CSS uses `object-fit: contain` and disables hover zoom cropping.
+The second responsive campaign also uses `Client/public/images/campaign-portrait.webp` and its 900px delivery version, `campaign-portrait-optimized.webp`. The portrait was edited from the generated wide campaign with built-in `image_gen` and encoded to WebP with Sharp. Full composition is preserved through intrinsic image proportions, and hover zoom cropping is disabled.
 
 Portrait edit prompt:
 

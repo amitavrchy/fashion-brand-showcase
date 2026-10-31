@@ -70,7 +70,11 @@ function AuthForm() {
   return (
     <div className="auth-layout">
       <div className="auth-photo">
-        <Photo src="/images/dress.jpg" alt="A quiet expression of individual style" priority />
+        <Photo
+          src="/images/studio-dress.webp"
+          alt="A quiet expression of individual style"
+          priority
+        />
         <span>
           A little space.
           <br />

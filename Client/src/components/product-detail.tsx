@@ -149,17 +149,18 @@ function ProductContent({ product, related }: { product: Product; related: Produ
               <ZoomIn size={19} />
             </span>
           </button>
-          {product.media.map((m, i) => (
-            <button
-              className={`gallery-thumbnail ${image === i ? 'selected' : ''}`}
-              key={m.id}
-              onClick={() => setImage(i)}
-              aria-label={`View ${m.alt}`}
-              aria-pressed={image === i}
-            >
-              <Photo src={m.url} alt={m.alt} sizes="25vw" />
-            </button>
-          ))}
+          {product.media.length > 1 &&
+            product.media.map((m, i) => (
+              <button
+                className={`gallery-thumbnail ${image === i ? 'selected' : ''}`}
+                key={m.id}
+                onClick={() => setImage(i)}
+                aria-label={`View ${m.alt}`}
+                aria-pressed={image === i}
+              >
+                <Photo src={m.url} alt={m.alt} sizes="25vw" />
+              </button>
+            ))}
         </div>
         <div className="product-info">
           <p className="eyebrow">

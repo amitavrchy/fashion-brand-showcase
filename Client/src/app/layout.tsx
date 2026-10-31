@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Manrope } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { Shell } from '@/components/shell';
 import './globals.css';
+import './refinement.css';
 
 const sans = Manrope({
   variable: '--font-ui',
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     title: 'ATELIER LUNE',
     description: 'Clothing as quiet architecture. Autumn / Winter 2026.',
     type: 'website',
-    images: [{ url: '/images/coat.jpg', width: 1600, height: 2400 }],
+    images: [{ url: '/images/studio-coat.webp', width: 1600, height: 2400 }],
   },
   twitter: { card: 'summary_large_image' },
 };

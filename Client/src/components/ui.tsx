@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import imageDimensions from '@/lib/image-dimensions.json';
 
 export function Photo({
   src,
@@ -22,22 +23,30 @@ export function Photo({
   mobileSrc?: string;
   onLoad?: React.ReactEventHandler<HTMLImageElement>;
 }) {
+  const dimensions = (imageDimensions as Record<string, number[]>)[src] || [1200, 1600];
   const photograph = (
     <Image
       src={src}
       alt={alt}
-      fill
+      width={dimensions[0]}
+      height={dimensions[1]}
       sizes={sizes}
       loading={priority ? 'eager' : 'lazy'}
       fetchPriority={priority ? 'high' : undefined}
-      style={{ objectFit: 'contain', objectPosition: 'center' }}
+      style={{
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        objectFit: 'cover',
+        objectPosition: 'center',
+      }}
       onLoad={onLoad}
       unoptimized={src.startsWith('https:') && !src.startsWith('https://images.unsplash.com/')}
       className={`photo ${className}`}
     />
   );
   return mobileSrc ? (
-    <picture style={{ position: 'absolute', inset: 0, display: 'block' }}>
+    <picture style={{ display: 'block', width: '100%' }}>
       <source media="(max-width: 600px)" srcSet={mobileSrc} />
       {photograph}
     </picture>
