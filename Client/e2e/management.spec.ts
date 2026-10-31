@@ -172,6 +172,22 @@ test('photographs fill their frames without letterboxing or source clipping', as
   ]) {
     await page.goto(path);
     await expect(page.locator('.loading-state')).toHaveCount(0);
+    const containers = await page.evaluate(() => {
+      const header = document.querySelector('.site-header')!.getBoundingClientRect();
+      const main = document.querySelector('#main')!.getBoundingClientRect();
+      return {
+        viewport: document.documentElement.clientWidth,
+        headerWidth: header.width,
+        mainWidth: main.width,
+        headerLeft: header.left,
+        mainLeft: main.left,
+        overflow: document.documentElement.scrollWidth - innerWidth,
+      };
+    });
+    expect(Math.abs(containers.headerWidth - containers.viewport * 0.9), path).toBeLessThan(1);
+    expect(Math.abs(containers.mainWidth - containers.headerWidth), path).toBeLessThan(1);
+    expect(Math.abs(containers.mainLeft - containers.headerLeft), path).toBeLessThan(1);
+    expect(containers.overflow, path).toBeLessThanOrEqual(1);
     const frames = page.locator(
       '.hero-photo,.collection-story-image,.materials-photo,.journal-image,.journal-feature-image,.article-hero,.stores-photo,.story-hero,.auth-photo,.lookbook-index-image,.look-chapter-image,.look-panel-photo,.gallery-main,.gallery-thumbnail,.lookbook-image,.atelier-visit-photo',
     );
@@ -184,6 +200,12 @@ test('photographs fill their frames without letterboxing or source clipping', as
       });
       const metrics = await frame.evaluate((element) => {
         const image = element.querySelector('img')!;
+        let ancestor: Element | null = image;
+        let rounded = false;
+        while (ancestor && ancestor.id !== 'main') {
+          if (parseFloat(getComputedStyle(ancestor).borderTopLeftRadius) > 0) rounded = true;
+          ancestor = ancestor.parentElement;
+        }
         return {
           frameWidth: element.clientWidth,
           frameHeight: element.clientHeight,
@@ -192,6 +214,7 @@ test('photographs fill their frames without letterboxing or source clipping', as
           naturalRatio: image.naturalWidth / image.naturalHeight,
           displayRatio: image.clientWidth / image.clientHeight,
           source: image.currentSrc,
+          rounded,
         };
       });
       expect(
@@ -206,6 +229,7 @@ test('photographs fill their frames without letterboxing or source clipping', as
         Math.abs(metrics.naturalRatio - metrics.displayRatio),
         `Source clipped at ${path}: ${metrics.source}`,
       ).toBeLessThan(0.015);
+      expect(metrics.rounded, `Missing image corners at ${path}: ${metrics.source}`).toBe(true);
     }
   }
 });
