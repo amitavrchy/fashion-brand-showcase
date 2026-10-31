@@ -189,6 +189,19 @@ export class PaymentsService implements OnModuleInit, OnModuleDestroy {
     if (!order || order.paymentProvider !== 'STRIPE')
       throw new NotFoundException('Checkout could not be found.');
     this.authorize(order, request, user);
+    return this.cancelReservedOrder(order);
+  }
+  async cancelAsAdmin(orderId: string) {
+    const order = await this.db.order.findUnique({ where: { id: orderId } });
+    if (!order || order.paymentProvider !== 'STRIPE')
+      throw new NotFoundException('Checkout could not be found.');
+    if (order.status === 'PAID' || order.status === 'SHIPPED')
+      throw new ConflictException(
+        'A paid order requires a refund through Stripe.',
+      );
+    return this.cancelReservedOrder(order);
+  }
+  private async cancelReservedOrder(order: Order): Promise<{ order: Order }> {
     if (order.status !== 'PENDING') return { order };
     if (order.stripeSessionId) {
       let session = await this.gateway.retrieve(order.stripeSessionId);
@@ -210,7 +223,9 @@ export class PaymentsService implements OnModuleInit, OnModuleDestroy {
     try {
       const session = await this.gateway.create(order);
       await this.attachSession(order, session);
-      return this.cancel(order.id, request, user);
+      return this.cancelReservedOrder(
+        await this.db.order.findUniqueOrThrow({ where: { id: order.id } }),
+      );
     } catch (error) {
       if (!this.gateway.definiteFailure(error))
         throw new ServiceUnavailableException(

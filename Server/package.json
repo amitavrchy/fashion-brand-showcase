@@ -22,6 +22,7 @@
     "db:migrate": "prisma migrate deploy",
     "db:seed": "node --env-file=.env prisma/seed.mjs",
     "stripe:listen": "node --env-file=.env scripts/stripe-listen.mjs",
+    "admin:local": "node --env-file=.env scripts/admin-local.mjs",
     "lint": "oxlint --type-aware src/ test/",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -47,6 +48,7 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "sharp": "^0.35.5",
     "stripe": "^23.1.0"
   },
   "devDependencies": {

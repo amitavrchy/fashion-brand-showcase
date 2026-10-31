@@ -8,6 +8,10 @@ import { ShopService } from './shop.service.js';
 import { StripeGateway } from './stripe.gateway.js';
 import { PaymentsService } from './payments.service.js';
 import { PaymentsController } from './payments.controller.js';
+import {
+  ContentController,
+  PublicContentController,
+} from './content.controller.js';
 
 @Module({
   imports: [
@@ -35,7 +39,13 @@ import { PaymentsController } from './payments.controller.js';
       },
     }),
   ],
-  controllers: [ShopController, AdminController, PaymentsController],
+  controllers: [
+    ShopController,
+    AdminController,
+    PaymentsController,
+    ContentController,
+    PublicContentController,
+  ],
   providers: [
     ShopService,
     SessionService,

@@ -108,28 +108,29 @@ model WishlistItem {
   productId String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   @@unique([userId, productId])
 }
 
 model Order {
-  id             String      @id @default(cuid())
-  userId         String?
-  user           User?       @relation(fields: [userId], references: [id])
-  email          String
-  status         OrderStatus @default(PENDING)
-  total          Decimal     @db.Decimal(10, 2)
-  itemsJson      Json
-  shippingJson   Json
-  idempotencyKey String      @unique
-  paymentProvider String    @default("MOCK")
-  stripeSessionId String?   @unique
-  stripePaymentIntentId String? @unique
-  checkoutUrl    String?
-  checkoutOrigin String?
-  expiresAt      DateTime?
-  stockReleasedAt DateTime?
-  paidAt         DateTime?
-  createdAt      DateTime    @default(now())
+  id                    String      @id @default(cuid())
+  userId                String?
+  user                  User?       @relation(fields: [userId], references: [id])
+  email                 String
+  status                OrderStatus @default(PENDING)
+  total                 Decimal     @db.Decimal(10, 2)
+  itemsJson             Json
+  shippingJson          Json
+  idempotencyKey        String      @unique
+  paymentProvider       String      @default("MOCK")
+  stripeSessionId       String?     @unique
+  stripePaymentIntentId String?     @unique
+  checkoutUrl           String?
+  checkoutOrigin        String?
+  expiresAt             DateTime?
+  stockReleasedAt       DateTime?
+  paidAt                DateTime?
+  createdAt             DateTime    @default(now())
 }
 
 model Store {
@@ -158,9 +159,20 @@ model Campaign {
   title       String
   subtitle    String
   image       String
+  mobileImage String?
   link        String
   accent      String  @default("#5C1F1F")
   active      Boolean @default(true)
+}
+
+model SiteSettings {
+  id                    String @id @default("main")
+  announcement          String @default("Complimentary delivery on orders over €300")
+  homeTitle             String @default("A wardrobe, considered.")
+  homeDescription       String @default("Beautiful pieces. Natural materials. An ease that stays with you, season after season.")
+  newsletterTitle       String @default("A letter from Lune.")
+  newsletterDescription String @default("New collections, stories and small things worth sharing. A little inspiration, occasionally.")
+  contactEmail          String @default("hello@atelierlune.example")
 }
 
 model NewsletterSubscriber {
@@ -173,4 +185,3 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-

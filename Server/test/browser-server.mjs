@@ -3,6 +3,7 @@ import { FakeStripeGateway, signedEvent } from './fake-stripe.mjs';
 import { PrismaClient } from '@prisma/client';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
+import { resolve } from 'node:path';
 
 assert.ok(process.env.DATABASE_URL, 'Set DATABASE_URL in Server/.env.');
 const url = new URL(process.env.DATABASE_URL);
@@ -17,6 +18,7 @@ if (!exists.length)
 await operator.$disconnect();
 process.env.DATABASE_URL = url.href;
 process.env.NODE_ENV = 'test';
+process.env.MEDIA_DIRECTORY = resolve('.data/browser-test-uploads');
 process.env.JWT_SECRET = 'browser-tests-only-secret-at-least-32-characters';
 process.env.ADMIN_EMAIL = 'browser-admin@example.test';
 process.env.ADMIN_PASSWORD = 'Browser-tests-only-2026';
@@ -38,14 +40,6 @@ await db.variant.updateMany({ data: { stock: 8 } });
 await db.variant.updateMany({
   where: { id: { endsWith: '-0-4' } },
   data: { stock: 0 },
-});
-await db.campaign.update({
-  where: { id: 'campaign-aw' },
-  data: { image: '/images/campaign-editorial.webp' },
-});
-await db.productMedia.updateMany({
-  where: { productId: 'p-coat', sortOrder: 0 },
-  data: { url: '/images/campaign-editorial.webp' },
 });
 await db.$disconnect();
 const { configureApplication } = await import('../dist/bootstrap.js');

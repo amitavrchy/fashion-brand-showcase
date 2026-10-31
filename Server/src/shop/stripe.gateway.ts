@@ -86,12 +86,6 @@ export class StripeGateway {
         success_url: `${order.checkoutOrigin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${order.checkoutOrigin}/checkout/cancel?order_id=${order.id}`,
         expires_at: Math.floor(order.expiresAt!.getTime() / 1000),
-        custom_text: {
-          submit: {
-            message:
-              'ATELIER LUNE · Test payment. No real funds will be charged.',
-          },
-        },
       },
       { idempotencyKey: `atelier-checkout-${order.id}` },
     );

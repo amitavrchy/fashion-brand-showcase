@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
+import express from 'express';
+import { mediaDirectory } from './shop/content.controller.js';
 import { AppModule } from './app.module.js';
 import { DatabaseExceptionFilter } from './shop/database.filter.js';
 
@@ -17,6 +19,15 @@ export function configureApplication(app: INestApplication) {
     .split(',')
     .map((s) => s.trim());
   app.use(helmet());
+  app.use(
+    '/media',
+    express.static(mediaDirectory, {
+      dotfiles: 'deny',
+      index: false,
+      maxAge: '1y',
+      immutable: true,
+    }),
+  );
   app.enableCors({ origin: origins, credentials: true });
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (/^\/(auth|wishlist|orders|payments|admin)(\/|$)/.test(req.path))
