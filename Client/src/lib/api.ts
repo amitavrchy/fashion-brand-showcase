@@ -12,7 +12,9 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     ...options,
     credentials: 'same-origin',
     headers: {
-      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(options.body && !(options.body instanceof FormData)
+        ? { 'Content-Type': 'application/json' }
+        : {}),
       ...options.headers,
     },
   });

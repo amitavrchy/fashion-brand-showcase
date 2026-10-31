@@ -88,6 +88,7 @@ test('product size guide, stock states, persistent bag and Stripe checkout and c
   await page.reload();
   await expect(page.locator('.cart-layout .bag-item')).toHaveCount(1);
   await page.locator('.order-summary').getByRole('link', { name: 'Continue to checkout' }).click();
+  await expect(page.locator('.checkout-test-note')).toHaveCount(1);
   await page.getByRole('button', { name: 'Continue to secure payment' }).click();
   await expect(page.getByText('Please enter a valid email address.')).toBeVisible();
   await page
@@ -117,9 +118,14 @@ test('account registration, saved pieces and wishlist persistence after sign out
   await page.getByRole('button', { name: 'Create your account', exact: true }).click();
   await expect(page.locator('h1')).toHaveText('Hello, Lune.');
   await page.goto('/collections');
+  const saved = page.waitForResponse(
+    (response) =>
+      response.url().endsWith('/wishlist/p-knit') && response.request().method() === 'PUT',
+  );
   await page
     .getByRole('button', { name: 'Save The cashmere crew to wishlist', exact: true })
     .click();
+  expect((await saved).ok()).toBe(true);
   await expect(
     page.getByRole('button', { name: 'Remove The cashmere crew from wishlist', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');
@@ -209,7 +215,7 @@ test('all main pages fit the viewport and every visible text element is at least
     '/cart',
   ]) {
     await page.goto(path);
-    await page.locator('.loading-state').waitFor({ state: 'hidden' });
+    await expect(page.locator('.loading-state')).toHaveCount(0);
     const result = await page.evaluate(() => {
       const tooSmall = [...document.querySelectorAll('body *')]
         .filter(

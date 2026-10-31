@@ -229,8 +229,10 @@ export function CheckoutPage() {
           <div className="payment-note">
             <ShieldCheck size={20} />
             <span>
-              Stripe test mode. Your payment details are entered securely on Stripe. No real funds
-              are charged, and your pieces are reserved while you complete payment.
+              Secure payment with Stripe. Your pieces are reserved while you complete payment.
+              <small className="checkout-test-note">
+                Test checkout — no real funds are charged.
+              </small>
             </span>
           </div>
           <form

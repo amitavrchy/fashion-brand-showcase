@@ -14,14 +14,14 @@ test('campaign preserves the complete photograph across screen sizes', async ({
         photo.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0),
       )
       .toBe(true);
-    await expect(photo).toHaveCSS('object-fit', 'contain');
+    await expect(photo).toHaveCSS('object-fit', 'cover');
     await expect(photo).toHaveCSS('transform', 'none');
     const frame = await page.locator('.hero-photo').first().boundingBox();
     expect(frame?.width).toBeCloseTo(width, 0);
     if (width <= 600) {
       await expect
         .poll(() => photo.evaluate((element: HTMLImageElement) => element.currentSrc))
-        .toContain('campaign-portrait');
+        .toContain('hero-coast-mobile');
       const copy = await page.locator('.hero-content').first().boundingBox();
       expect(copy!.y).toBeGreaterThanOrEqual(frame!.y + frame!.height - 1);
     }
@@ -34,7 +34,7 @@ test('campaign preserves the complete photograph across screen sizes', async ({
   const fits = await page
     .locator('img.photo')
     .evaluateAll((images) =>
-      images.every((image) => getComputedStyle(image).objectFit === 'contain'),
+      images.every((image) => getComputedStyle(image).objectFit === 'cover'),
     );
   expect(fits).toBe(true);
 });

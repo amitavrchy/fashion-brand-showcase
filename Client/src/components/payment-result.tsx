@@ -128,13 +128,13 @@ export function PaymentResult({ cancelled = false }: { cancelled?: boolean }) {
   return (
     <div className="order-confirmation">
       <CheckCircle2 size={48} strokeWidth={1} />
-      <p className="eyebrow">Test payment confirmed by Stripe</p>
+      <p className="eyebrow">Your order is confirmed</p>
       <h1>
         Beautifully <em>chosen.</em>
       </h1>
       <p>
-        Stripe has confirmed your test payment. Your order is recorded and your selection is
-        reserved for you. No real funds were charged.
+        Thank you for choosing Atelier Lune. Your payment is confirmed, and your selection is
+        recorded below.
       </p>
       <div className="confirmation-details">
         <div className="summary-row">
@@ -164,7 +164,7 @@ export function PaymentResult({ cancelled = false }: { cancelled?: boolean }) {
           </div>
         ))}
         <div className="summary-row total">
-          <span>Total paid in test mode</span>
+          <span>Total paid</span>
           <span>{money(order.total)}</span>
         </div>
         <p className="muted">

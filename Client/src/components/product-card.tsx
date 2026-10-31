@@ -20,7 +20,7 @@ export function WishButton({ product, className = '' }: { product: Product; clas
   const client = useQueryClient();
   const mutation = useMutation({
     mutationFn: (remove: boolean) =>
-      api(`wishlist/${product.id}`, { method: remove ? 'DELETE' : 'PUT' }),
+      api(`wishlist/${product.id}`, { method: remove ? 'DELETE' : 'PUT', keepalive: true }),
     onError: (e) => {
       dispatch(toggleWishlist(product.id));
       setError(message(e));
@@ -57,7 +57,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
       <div className="product-image">
         <Link href={`/product/${product.slug}`} aria-label={`Discover ${product.name}`}>
           <Photo
-            src={product.media[0]?.url || '/images/coat.jpg'}
+            src={product.media[0]?.url || '/images/studio-coat.webp'}
             alt={product.media[0]?.alt || product.name}
             sizes="(max-width: 700px) 50vw, 25vw"
             className="primary-image"

@@ -36,9 +36,12 @@ export default function Page() {
               unwashed, with their original tags and packaging.
             </p>
             <p>
-              This is a concept storefront with Stripe test payments. No real funds are charged and
-              no physical delivery is arranged. Delivery prices and return policies are provided to
-              demonstrate the complete shopping experience.
+              These policies describe our concept collection. Physical delivery is not arranged;
+              please see our{' '}
+              <Link className="text-link" href="/terms">
+                terms
+              </Link>{' '}
+              for details.
             </p>
           </section>
           <section id="sizing">
@@ -93,12 +96,6 @@ export default function Page() {
               Your card information is entered on Stripe’s hosted payment page and is never sent to
               this application’s server. We reserve available stock before opening payment and
               confirm your order after Stripe verifies success.
-            </p>
-            <p>
-              This storefront is connected to Stripe in test mode. To explore a successful test
-              payment, use card number 4242 4242 4242 4242, a future expiry date and any three-digit
-              CVC. No real funds are charged. For a test decline, Stripe provides card 4000 0000
-              0000 0002.
             </p>
             <p>
               If you return from Stripe before paying, we confirm cancellation and release the

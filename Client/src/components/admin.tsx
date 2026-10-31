@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -10,6 +10,7 @@ import { api, message, money } from '@/lib/api';
 import type { AdminData, Campaign, Collection, Product } from '@/lib/types';
 import { useAppSelector } from '@/features/store';
 import { EmptyState, ErrorState, Loading, Modal } from './ui';
+import { AdminContent, AdminOrders, MediaField, type ContentSection } from './admin-content';
 
 type Editor =
   | { kind: 'products'; value?: Product }
@@ -42,7 +43,9 @@ export function AdminPage() {
 function AdminDashboard() {
   const query = useQuery({ queryKey: ['admin'], queryFn: () => api<AdminData>('admin') });
   const client = useQueryClient();
-  const [tab, setTab] = useState<'products' | 'collections' | 'campaigns' | 'orders'>('products');
+  const [tab, setTab] = useState<
+    'products' | 'collections' | 'campaigns' | 'orders' | ContentSection
+  >('products');
   const [editor, setEditor] = useState<Editor | null>(null);
   const [removing, setRemoving] = useState<{ path: string; title: string; kind: string } | null>(
     null,
@@ -104,180 +107,203 @@ function AdminDashboard() {
           <p>Newsletter subscribers</p>
         </div>
       </div>
-      <nav className="account-tabs" aria-label="Admin sections">
-        {(['products', 'collections', 'campaigns', 'orders'] as const).map((t) => (
+      <nav className="account-tabs admin-tabs" aria-label="Admin sections">
+        {(
+          [
+            'products',
+            'collections',
+            'campaigns',
+            'journal',
+            'lookbooks',
+            'stores',
+            'orders',
+            'subscribers',
+            'settings',
+          ] as const
+        ).map((t) => (
           <button className={tab === t ? 'selected' : ''} key={t} onClick={() => setTab(t)}>
             {t[0].toUpperCase() + t.slice(1)}
           </button>
         ))}
       </nav>
-      {tab !== 'orders' && (
-        <div className="admin-toolbar">
-          <p className="muted">
-            {tab === 'products'
-              ? 'Manage pieces, variants, stock and publishing.'
-              : tab === 'collections'
-                ? 'Shape the wardrobe into considered collections.'
-                : 'Curate the campaigns in the homepage carousel.'}
-          </p>
-          <button className="button" onClick={() => open({ kind: tab } as Editor)}>
-            <Plus size={17} />
-            Add {tab === 'products' ? 'piece' : tab === 'collections' ? 'collection' : 'campaign'}
-          </button>
-        </div>
-      )}
-      <div className="admin-table-wrap">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              {(tab === 'products'
-                ? ['Piece', 'Category', 'Price', 'Stock', 'Status', 'Actions']
-                : tab === 'collections'
-                  ? ['Collection', 'Season', 'Pieces', 'Actions']
-                  : tab === 'campaigns'
-                    ? ['Campaign', 'Destination', 'Status', 'Actions']
-                    : ['Reference', 'Customer', 'Total', 'Status', 'Date']
-              ).map((h) => (
-                <th key={h} scope="col">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {tab === 'products' &&
-              data.products.map((p) => (
-                <tr key={p.id}>
-                  <td>
-                    <strong>{p.name}</strong>
-                    <span className="muted">/{p.slug}</span>
-                  </td>
-                  <td>{p.category}</td>
-                  <td>{money(p.price)}</td>
-                  <td>{p.variants.reduce((s, v) => s + v.stock, 0)}</td>
-                  <td>
-                    <span className="status-tag">{p.published ? 'Published' : 'Unpublished'}</span>
-                  </td>
-                  <td>
-                    <div className="row-actions">
-                      <button
-                        className="icon-button"
-                        onClick={() => open({ kind: 'products', value: p })}
-                        aria-label={`Edit ${p.name}`}
-                      >
-                        <Pencil size={17} />
-                      </button>
-                      <button
-                        className="icon-button"
-                        disabled={!p.published}
-                        onClick={() => {
-                          save.reset();
-                          setRemoving({
-                            path: `admin/products/${p.id}`,
-                            title: p.name,
-                            kind: 'products',
-                          });
-                        }}
-                        aria-label={`Unpublish ${p.name}`}
-                      >
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </td>
+      {(['journal', 'lookbooks', 'stores', 'settings', 'subscribers'] as string[]).includes(
+        tab,
+      ) && <AdminContent key={tab} section={tab as ContentSection} products={data.products} />}
+      {tab === 'orders' && <AdminOrders orders={data.orders} />}
+      {(['products', 'collections', 'campaigns'] as string[]).includes(tab) && (
+        <>
+          {tab !== 'orders' && (
+            <div className="admin-toolbar">
+              <p className="muted">
+                {tab === 'products'
+                  ? 'Manage pieces, variants, stock and publishing.'
+                  : tab === 'collections'
+                    ? 'Shape the wardrobe into considered collections.'
+                    : 'Curate the campaigns in the homepage carousel.'}
+              </p>
+              <button className="button" onClick={() => open({ kind: tab } as Editor)}>
+                <Plus size={17} />
+                Add{' '}
+                {tab === 'products' ? 'piece' : tab === 'collections' ? 'collection' : 'campaign'}
+              </button>
+            </div>
+          )}
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  {(tab === 'products'
+                    ? ['Piece', 'Category', 'Price', 'Stock', 'Status', 'Actions']
+                    : tab === 'collections'
+                      ? ['Collection', 'Season', 'Pieces', 'Actions']
+                      : tab === 'campaigns'
+                        ? ['Campaign', 'Destination', 'Status', 'Actions']
+                        : ['Reference', 'Customer', 'Total', 'Status', 'Date']
+                  ).map((h) => (
+                    <th key={h} scope="col">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            {tab === 'collections' &&
-              data.collections.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <strong>{c.title}</strong>
-                    <span className="muted">/{c.slug}</span>
-                  </td>
-                  <td>{c.season}</td>
-                  <td>{data.products.filter((p) => p.collectionId === c.id).length}</td>
-                  <td>
-                    <div className="row-actions">
-                      <button
-                        className="icon-button"
-                        onClick={() => open({ kind: 'collections', value: c })}
-                        aria-label={`Edit ${c.title}`}
-                      >
-                        <Pencil size={17} />
-                      </button>
-                      <button
-                        className="icon-button"
-                        onClick={() => {
-                          save.reset();
-                          setRemoving({
-                            path: `admin/collections/${c.id}`,
-                            title: c.title,
-                            kind: 'collections',
-                          });
-                        }}
-                        aria-label={`Delete ${c.title}`}
-                      >
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            {tab === 'campaigns' &&
-              data.campaigns.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <strong>{c.title.replaceAll('\n', ' ')}</strong>
-                    <span className="muted">{c.subtitle}</span>
-                  </td>
-                  <td>{c.link}</td>
-                  <td>
-                    <span className="status-tag">{c.active ? 'Active' : 'Inactive'}</span>
-                  </td>
-                  <td>
-                    <div className="row-actions">
-                      <button
-                        className="icon-button"
-                        onClick={() => open({ kind: 'campaigns', value: c })}
-                        aria-label={`Edit ${c.title}`}
-                      >
-                        <Pencil size={17} />
-                      </button>
-                      <button
-                        className="icon-button"
-                        onClick={() => {
-                          save.reset();
-                          setRemoving({
-                            path: `admin/campaigns/${c.id}`,
-                            title: c.title,
-                            kind: 'campaigns',
-                          });
-                        }}
-                        aria-label={`Delete ${c.title}`}
-                      >
-                        <Trash2 size={17} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            {tab === 'orders' &&
-              data.orders.map((o) => (
-                <tr key={o.id}>
-                  <td>{o.id.slice(-8).toUpperCase()}</td>
-                  <td>{o.email}</td>
-                  <td>{money(o.total)}</td>
-                  <td>{o.status}</td>
-                  <td>{new Date(o.createdAt).toLocaleDateString('en-GB')}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-      {tab === 'orders' && !data.orders.length && (
-        <EmptyState
-          title="A quiet start."
-          text="Orders will appear here as customers begin and complete checkout."
-        />
+              </thead>
+              <tbody>
+                {tab === 'products' &&
+                  data.products.map((p) => (
+                    <tr key={p.id}>
+                      <td>
+                        <strong>{p.name}</strong>
+                        <span className="muted">/{p.slug}</span>
+                      </td>
+                      <td>{p.category}</td>
+                      <td>{money(p.price)}</td>
+                      <td>{p.variants.reduce((s, v) => s + v.stock, 0)}</td>
+                      <td>
+                        <span className="status-tag">
+                          {p.published ? 'Published' : 'Unpublished'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="row-actions">
+                          <button
+                            className="icon-button"
+                            onClick={() => open({ kind: 'products', value: p })}
+                            aria-label={`Edit ${p.name}`}
+                          >
+                            <Pencil size={17} />
+                          </button>
+                          <button
+                            className="icon-button"
+                            disabled={!p.published}
+                            onClick={() => {
+                              save.reset();
+                              setRemoving({
+                                path: `admin/products/${p.id}`,
+                                title: p.name,
+                                kind: 'products',
+                              });
+                            }}
+                            aria-label={`Unpublish ${p.name}`}
+                          >
+                            <Trash2 size={17} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                {tab === 'collections' &&
+                  data.collections.map((c) => (
+                    <tr key={c.id}>
+                      <td>
+                        <strong>{c.title}</strong>
+                        <span className="muted">/{c.slug}</span>
+                      </td>
+                      <td>{c.season}</td>
+                      <td>{data.products.filter((p) => p.collectionId === c.id).length}</td>
+                      <td>
+                        <div className="row-actions">
+                          <button
+                            className="icon-button"
+                            onClick={() => open({ kind: 'collections', value: c })}
+                            aria-label={`Edit ${c.title}`}
+                          >
+                            <Pencil size={17} />
+                          </button>
+                          <button
+                            className="icon-button"
+                            onClick={() => {
+                              save.reset();
+                              setRemoving({
+                                path: `admin/collections/${c.id}`,
+                                title: c.title,
+                                kind: 'collections',
+                              });
+                            }}
+                            aria-label={`Delete ${c.title}`}
+                          >
+                            <Trash2 size={17} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                {tab === 'campaigns' &&
+                  data.campaigns.map((c) => (
+                    <tr key={c.id}>
+                      <td>
+                        <strong>{c.title.replaceAll('\n', ' ')}</strong>
+                        <span className="muted">{c.subtitle}</span>
+                      </td>
+                      <td>{c.link}</td>
+                      <td>
+                        <span className="status-tag">{c.active ? 'Active' : 'Inactive'}</span>
+                      </td>
+                      <td>
+                        <div className="row-actions">
+                          <button
+                            className="icon-button"
+                            onClick={() => open({ kind: 'campaigns', value: c })}
+                            aria-label={`Edit ${c.title}`}
+                          >
+                            <Pencil size={17} />
+                          </button>
+                          <button
+                            className="icon-button"
+                            onClick={() => {
+                              save.reset();
+                              setRemoving({
+                                path: `admin/campaigns/${c.id}`,
+                                title: c.title,
+                                kind: 'campaigns',
+                              });
+                            }}
+                            aria-label={`Delete ${c.title}`}
+                          >
+                            <Trash2 size={17} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                {tab === 'orders' &&
+                  data.orders.map((o) => (
+                    <tr key={o.id}>
+                      <td>{o.id.slice(-8).toUpperCase()}</td>
+                      <td>{o.email}</td>
+                      <td>{money(o.total)}</td>
+                      <td>{o.status}</td>
+                      <td>{new Date(o.createdAt).toLocaleDateString('en-GB')}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+          {tab === 'orders' && !data.orders.length && (
+            <EmptyState
+              title="A quiet start."
+              text="Orders will appear here as customers begin and complete checkout."
+            />
+          )}
+        </>
       )}
       <Modal
         open={!!editor}
@@ -362,7 +388,7 @@ function AdminDashboard() {
 const imageSchema = z
   .string()
   .regex(
-    /^(\/images\/[a-zA-Z0-9._-]+|https:\/\/[^\s]+)$/,
+    /^(\/(?:images|api\/media)\/[a-zA-Z0-9._-]+|https:\/\/[^\s]+)$/,
     'Use a local /images/ path or an HTTPS image URL.',
   );
 const productSchema = z.object({
@@ -440,12 +466,13 @@ function ProductEditor({
           price: 100,
           collectionId: '',
           published: false,
-          media: [{ url: '/images/coat.jpg', alt: '' }],
+          media: [{ url: '/images/studio-coat.webp', alt: '' }],
           variants: [{ colorName: 'Sand', colorHex: '#C7B79E', size: 'M', stock: 10 }],
         },
   });
   const variants = useFieldArray({ control: form.control, name: 'variants' });
   const media = useFieldArray({ control: form.control, name: 'media' });
+  const mediaValues = useWatch({ control: form.control, name: 'media' });
   return (
     <form className="admin-form" onSubmit={form.handleSubmit(onSave)} noValidate>
       <fieldset disabled={pending}>
@@ -514,9 +541,15 @@ function ProductEditor({
         </p>
         {media.fields.map((field, i) => (
           <div className="admin-media-row" key={field.id}>
-            <div className="field">
-              <label htmlFor={`media-url-${i}`}>Image {i + 1} URL</label>
-              <input id={`media-url-${i}`} {...form.register(`media.${i}.url`)} />
+            <div>
+              <MediaField
+                id={`media-url-${i}`}
+                label={`Image ${i + 1} URL`}
+                value={mediaValues?.[i]?.url || ''}
+                onChange={(url) =>
+                  form.setValue(`media.${i}.url`, url, { shouldDirty: true, shouldValidate: true })
+                }
+              />
               {form.formState.errors.media?.[i]?.url && (
                 <p className="form-error">{form.formState.errors.media[i]?.url?.message}</p>
               )}
@@ -631,13 +664,29 @@ function CollectionEditor({ value, onSave, pending }: { value?: Collection } & E
           heroImage: value.heroImage,
           season: value.season,
         }
-      : { title: '', slug: '', description: '', heroImage: '/images/coat.jpg', season: 'AW 2026' },
+      : {
+          title: '',
+          slug: '',
+          description: '',
+          heroImage: '/images/studio-coat.webp',
+          season: 'AW 2026',
+        },
   });
+  const heroImage = useWatch({ control: form.control, name: 'heroImage' });
   return (
     <form className="admin-form" onSubmit={form.handleSubmit(onSave)} noValidate>
       <fieldset disabled={pending}>
         <div className="stack">
-          {(['title', 'slug', 'description', 'heroImage', 'season'] as const).map((key) => (
+          <MediaField
+            id="collection-heroImage"
+            label="Cover image URL"
+            value={heroImage}
+            error={form.formState.errors.heroImage?.message}
+            onChange={(url) =>
+              form.setValue('heroImage', url, { shouldDirty: true, shouldValidate: true })
+            }
+          />
+          {(['title', 'slug', 'description', 'season'] as const).map((key) => (
             <div className="field" key={key}>
               <label htmlFor={`collection-${key}`}>
                 {
@@ -673,6 +722,7 @@ const campaignSchema = z.object({
   title: z.string().min(3).max(100),
   subtitle: z.string().min(3).max(100),
   image: imageSchema,
+  mobileImage: z.union([imageSchema, z.literal('')]),
   link: z
     .string()
     .regex(
@@ -690,6 +740,7 @@ function CampaignEditor({ value, onSave, pending }: { value?: Campaign } & Edito
           title: value.title,
           subtitle: value.subtitle,
           image: value.image,
+          mobileImage: value.mobileImage || '',
           link: value.link,
           accent: value.accent,
           active: value.active,
@@ -697,17 +748,48 @@ function CampaignEditor({ value, onSave, pending }: { value?: Campaign } & Edito
       : {
           title: '',
           subtitle: 'AUTUMN / WINTER 2026',
-          image: '/images/coat.jpg',
+          image: '/images/studio-coat.webp',
+          mobileImage: '',
           link: '/collections',
           accent: '#5C1F1F',
           active: true,
         },
   });
+  const campaignImages = useWatch({ control: form.control, name: ['image', 'mobileImage'] });
   return (
-    <form className="admin-form" onSubmit={form.handleSubmit(onSave)} noValidate>
+    <form
+      className="admin-form"
+      onSubmit={form.handleSubmit((values) =>
+        onSave({ ...values, mobileImage: values.mobileImage || null }),
+      )}
+      noValidate
+    >
       <fieldset disabled={pending}>
         <div className="stack">
-          {(['title', 'subtitle', 'image', 'link', 'accent'] as const).map((key) => (
+          <MediaField
+            id="campaign-image"
+            label="Desktop campaign photograph (16:9)"
+            value={campaignImages[0]}
+            error={form.formState.errors.image?.message}
+            onChange={(url) =>
+              form.setValue('image', url, { shouldDirty: true, shouldValidate: true })
+            }
+          />
+          <MediaField
+            id="campaign-mobileImage"
+            label="Mobile campaign photograph (3:4, optional)"
+            value={campaignImages[1]}
+            required={false}
+            error={form.formState.errors.mobileImage?.message}
+            onChange={(url) =>
+              form.setValue('mobileImage', url, { shouldDirty: true, shouldValidate: true })
+            }
+          />
+          <p className="muted">
+            Choose images with complete heads and generous breathing room. The mobile photograph is
+            optional; use a composition that works in portrait on small screens.
+          </p>
+          {(['title', 'subtitle', 'link', 'accent'] as const).map((key) => (
             <div className="field" key={key}>
               <label htmlFor={`campaign-${key}`}>
                 {
@@ -716,7 +798,7 @@ function CampaignEditor({ value, onSave, pending }: { value?: Campaign } & Edito
                     subtitle: 'Season or subtitle',
                     image: 'Campaign image URL',
                     link: 'Destination path',
-                    accent: 'Accent color (#RRGGBB)',
+                    accent: 'Campaign text color (#RRGGBB)',
                   }[key]
                 }
               </label>
