@@ -5,7 +5,7 @@ test('homepage keeps one heading scale and equally sized collection photographs'
   isMobile,
 }) => {
   await page.goto('/');
-  await expect(page.locator('.home-page .collection-story-card')).toHaveCount(3);
+  await expect(page.locator('.home-page .collection-story-card')).toHaveCount(6);
   await expect(page.locator('.home-page .journal-card')).toHaveCount(3);
   await page.locator('.home-page img').evaluateAll((images) =>
     Promise.all(
@@ -50,7 +50,7 @@ test('campaign preserves the complete photograph across screen sizes', async ({
   await page.goto('/');
   const photo = page.locator('.hero-slide').first().locator('img');
   await expect(photo).toBeVisible();
-  for (const width of isMobile ? [390, 360] : [1920, 1440, 1280, 768]) {
+  for (const width of isMobile ? [390, 360] : [1920, 1440, 1280, 768, 700, 601]) {
     await page.setViewportSize({ width, height: 900 });
     await expect
       .poll(() =>
@@ -60,11 +60,13 @@ test('campaign preserves the complete photograph across screen sizes', async ({
     await expect(photo).toHaveCSS('object-fit', 'cover');
     await expect(photo).toHaveCSS('transform', 'none');
     const frame = await page.locator('.hero-photo').first().boundingBox();
-    expect(frame?.width).toBeCloseTo(width, 0);
+    expect(frame?.width).toBeCloseTo(width * 0.9, 0);
     if (width <= 600) {
       await expect
         .poll(() => photo.evaluate((element: HTMLImageElement) => element.currentSrc))
         .toContain('hero-coast-mobile');
+    }
+    if (width <= 700) {
       const copy = await page.locator('.hero-content').first().boundingBox();
       expect(copy!.y).toBeGreaterThanOrEqual(frame!.y + frame!.height - 1);
     }
