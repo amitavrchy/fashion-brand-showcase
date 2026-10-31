@@ -62,7 +62,7 @@ Sign in through `/account`, then open `/admin`. Seeding is idempotent and preser
 - Nine protected management sections: products/variants, collections, desktop/mobile campaigns, journal publishing/scheduling, lookbooks with reorderable chapters and clickable product points, stores, order details and fulfilment, subscriber CSV export, and storefront settings. Product unpublishing preserves order history.
 - Image uploads validate and re-encode JPEG/PNG/WebP photographs, strip metadata, preserve complete proportions and save to persistent local media storage. Storefront settings control the announcement, homepage introduction, newsletter and contact email.
 - Self-hosted fonts, a 14px minimum UI text size, reduced-motion support, focus states, native accessible dialogs, product JSON-LD, metadata, sitemap and robots rules.
-- 24 pieces across six collections, twelve journal stories, six concept boutiques, material guides, wardrobe advice, brand stories and detailed care/service answers.
+- 24 pieces across eight collections, twelve journal stories, six concept boutiques, material guides, wardrobe advice, brand stories and detailed care/service answers.
 
 ## Stripe test payments
 

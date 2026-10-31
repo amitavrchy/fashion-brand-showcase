@@ -5,7 +5,7 @@ test('homepage keeps one heading scale and equally sized collection photographs'
   isMobile,
 }) => {
   await page.goto('/');
-  await expect(page.locator('.home-page .collection-story-card')).toHaveCount(6);
+  await expect(page.locator('.home-page .collection-story-card')).toHaveCount(8);
   await expect(page.locator('.home-page .journal-card')).toHaveCount(3);
   await page.locator('.home-page img').evaluateAll((images) =>
     Promise.all(
@@ -25,6 +25,16 @@ test('homepage keeps one heading scale and equally sized collection photographs'
     collectionImages: [...document.querySelectorAll('.collection-story-image')].map(
       (element) => element.getBoundingClientRect().height,
     ),
+    collectionRows: Object.values(
+      [...document.querySelectorAll('.collection-story-card')].reduce<Record<string, number>>(
+        (rows, element) => {
+          const top = Math.round(element.getBoundingClientRect().top);
+          rows[top] = (rows[top] || 0) + 1;
+          return rows;
+        },
+        {},
+      ),
+    ),
     journalImages: [...document.querySelectorAll('.home-page .journal-image')].map(
       (element) => element.getBoundingClientRect().height,
     ),
@@ -41,6 +51,17 @@ test('homepage keeps one heading scale and equally sized collection photographs'
     Math.max(...metrics.journalImages) - Math.min(...metrics.journalImages),
   ).toBeLessThanOrEqual(1);
   expect(metrics.overflow).toBeLessThanOrEqual(1);
+  expect(metrics.collectionRows).toEqual(isMobile ? [2, 2, 2, 2] : [4, 4]);
+  for (const [slug, title] of [
+    ['after-hours', 'After hours'],
+    ['tailored-ease', 'Tailored ease'],
+  ]) {
+    await page.locator(`.collection-story-card[href="/collections/${slug}"]`).click();
+    await expect(page.locator('h1')).toHaveText(title);
+    await expect(page.locator('.catalog-grid .product-card')).toHaveCount(2);
+    await page.goto('/');
+    await expect(page.locator('.collection-story-card')).toHaveCount(8);
+  }
 });
 
 test('campaign preserves the complete photograph across screen sizes', async ({
