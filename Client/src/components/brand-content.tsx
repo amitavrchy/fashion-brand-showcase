@@ -18,14 +18,19 @@ export function CollectionStories({ catalog }: { catalog?: Catalog }) {
     <section className="collection-stories section-pad">
       <Reveal className="section-heading">
         <div>
-          <p className="eyebrow">A wardrobe with a point of view</p>
+          <p className="eyebrow">The collection edit</p>
           <h2>
-            Find your <em>own rhythm.</em>
+            Find your <em>rhythm.</em>
           </h2>
         </div>
         <ArrowLink href="/collections">Every considered piece</ArrowLink>
       </Reveal>
-      <div className="collection-story-grid">
+      <div
+        className="collection-story-grid"
+        role="region"
+        aria-label="Featured collections"
+        tabIndex={0}
+      >
         {featured.map((collection, index) => (
           <Reveal key={collection.id} delay={(index % 3) * 0.06}>
             <Link className="collection-story-card" href={`/collections/${collection.slug}`}>
@@ -39,13 +44,15 @@ export function CollectionStories({ catalog }: { catalog?: Catalog }) {
                   <ArrowUpRight size={21} />
                 </span>
               </div>
-              <p className="eyebrow muted">{collection.season}</p>
-              <h3>{collection.title}</h3>
-              <p>{collection.description}</p>
-              <span className="text-link">
-                Explore {catalog.products.filter((p) => p.collectionId === collection.id).length}{' '}
-                pieces
-              </span>
+              <div className="collection-story-copy">
+                <p className="eyebrow muted">{collection.season}</p>
+                <h3>{collection.title}</h3>
+                <p>{collection.description}</p>
+                <span className="text-link">
+                  Explore {catalog.products.filter((p) => p.collectionId === collection.id).length}{' '}
+                  pieces
+                </span>
+              </div>
             </Link>
           </Reveal>
         ))}
@@ -147,11 +154,7 @@ export function AtelierVisit() {
           Some things are better understood in person. The feel of a fabric. The fall of a sleeve. A
           conversation about the piece you will wear most.
         </p>
-        <p>
-          Our world stretches from Paris to Copenhagen, with concept spaces in London, Amsterdam,
-          Milan and Berlin. Each shares the same invitation: step inside, take your time, and find
-          what feels like you.
-        </p>
+        <p>Paris · Copenhagen · London · Amsterdam · Milan · Berlin.</p>
         <ArrowLink href="/stores">Explore our six spaces</ArrowLink>
       </Reveal>
     </section>
@@ -163,9 +166,7 @@ export function ConsideredQuestions() {
       <div>
         <p className="eyebrow">A little guidance</p>
         <h2>
-          Thoughtfully
-          <br />
-          <em>answered.</em>
+          Good to <em>know.</em>
         </h2>
         <p>The details that make choosing feel easier.</p>
         <div className="service-promises">
