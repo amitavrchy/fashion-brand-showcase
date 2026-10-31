@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export function Photo({ src, alt, className = '', priority = false, sizes = '(max-width: 700px) 100vw, 50vw' }: { src: string; alt: string; className?: string; priority?: boolean; sizes?: string }) {
-  return <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className={`photo ${className}`} />;
+  return <Image src={src} alt={alt} fill sizes={sizes} priority={priority} unoptimized={src.startsWith('https:') && !src.startsWith('https://images.unsplash.com/')} className={`photo ${className}`} />;
 }
 export function ArrowLink({ href, children, className = '' }: { href: string; children: React.ReactNode; className?: string }) {
   return <Link href={href} className={`arrow-link ${className}`}><span>{children}</span><ArrowRight size={19} strokeWidth={1.4} /></Link>;
@@ -28,7 +28,7 @@ export function Modal({ open, onClose, title, children, className = '' }: { open
       return () => { document.body.style.overflow = previous; };
     }
   }, [open]);
-  return <dialog ref={ref} className={`dialog ${className}`} aria-label={title} onCancel={onClose} onClick={e => { if (e.target === e.currentTarget) onClose(); }} data-lenis-prevent><div className="dialog-inner"><div className="dialog-heading"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close dialog"><X size={23} /></button></div>{children}</div></dialog>;
+  return <dialog ref={ref} className={`dialog ${className}`} aria-label={title} onCancel={onClose} onClick={e => { if (e.target === e.currentTarget || (e.target instanceof Element && e.target.closest('a[href]'))) onClose(); }} data-lenis-prevent><div className="dialog-inner"><div className="dialog-heading"><h2>{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close dialog"><X size={23} /></button></div>{children}</div></dialog>;
 }
 export function Loading({ label = 'A moment, please…' }: { label?: string }) { return <div className="loading-state" role="status"><span className="loading-mark">L</span><p>{label}</p></div>; }
 export function ErrorState({ retry }: { retry: () => void }) { return <div className="empty-state"><p className="eyebrow">A small interruption</p><h2>Let’s try that again.</h2><p>We couldn’t connect to the atelier. Please try again in a moment.</p><button className="button" onClick={retry}>Try again <ArrowRight size={18} /></button></div>; }

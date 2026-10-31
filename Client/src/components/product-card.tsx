@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Heart, ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, message, money } from '@/lib/api';
 import type { Product } from '@/lib/types';
 import { toggleWishlist, useAppDispatch, useAppSelector } from '@/features/store';
@@ -13,9 +13,11 @@ export function WishButton({ product, className = '' }: { product: Product; clas
   const wished = useAppSelector(s => s.wishlist.ids.includes(product.id));
   const user = useAppSelector(s => s.auth.user);
   const [error, setError] = useState('');
+  const client = useQueryClient();
   const mutation = useMutation({
     mutationFn: (remove: boolean) => api(`wishlist/${product.id}`, { method: remove ? 'DELETE' : 'PUT' }),
     onError: e => { dispatch(toggleWishlist(product.id)); setError(message(e)); },
+    onSettled: () => client.invalidateQueries({ queryKey: ['wishlist'] }),
   });
   return <><button className={`icon-button wish-button ${wished ? 'is-wished' : ''} ${className}`} aria-label={`${wished ? 'Remove' : 'Save'} ${product.name} ${wished ? 'from' : 'to'} wishlist`} aria-pressed={wished} disabled={mutation.isPending} onClick={() => { setError(''); dispatch(toggleWishlist(product.id)); if (user) mutation.mutate(wished); }}><Heart size={20} strokeWidth={1.3} fill={wished ? 'currentColor' : 'none'} /></button>{error && <span className="card-error" role="alert">{error}</span>}</>;
 }
