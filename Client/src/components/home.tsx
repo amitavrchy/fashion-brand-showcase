@@ -69,7 +69,7 @@ export function HomePage() {
                     src={c.image}
                     mobileSrc={
                       c.image === '/images/campaign-editorial.webp'
-                        ? '/images/campaign-portrait.webp'
+                        ? '/images/campaign-portrait-optimized.webp'
                         : undefined
                     }
                     alt="An exploration of form, movement and contemporary style"

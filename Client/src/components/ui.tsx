@@ -36,7 +36,14 @@ export function Photo({
       className={`photo ${className}`}
     />
   );
-  return mobileSrc ? <picture><source media="(max-width: 600px)" srcSet={mobileSrc} />{photograph}</picture> : photograph;
+  return mobileSrc ? (
+    <picture style={{ position: 'absolute', inset: 0, display: 'block' }}>
+      <source media="(max-width: 600px)" srcSet={mobileSrc} />
+      {photograph}
+    </picture>
+  ) : (
+    photograph
+  );
 }
 export function ArrowLink({
   href,
