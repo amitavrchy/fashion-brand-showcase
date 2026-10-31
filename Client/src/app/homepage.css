@@ -256,7 +256,7 @@
 }
 /* Every collection gets a complete photographic card on a regular grid. */
 .home-page .collection-story-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
   gap: 56px 32px;
 }

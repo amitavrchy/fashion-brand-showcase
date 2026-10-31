@@ -31,7 +31,7 @@ export function CollectionStories({ catalog }: { catalog?: Catalog }) {
                 <Photo
                   src={collection.heroImage}
                   alt={`${collection.title} — explore the complete collection`}
-                  sizes="(max-width: 1000px) 44vw, 29vw"
+                  sizes="(max-width: 1000px) 44vw, 21vw"
                 />
                 <span className="round-arrow">
                   <ArrowUpRight size={21} />
