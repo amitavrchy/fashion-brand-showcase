@@ -1,0 +1,13 @@
+{
+  "name": "atelier-lune",
+  "private": true,
+  "engines": { "node": ">=22.0.0" },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "db": "npm --prefix Server run db:local",
+    "db:prepare": "npm --prefix Server run db:migrate && npm --prefix Server run db:seed",
+    "dev": "node scripts/dev.mjs",
+    "build": "npm --prefix Server run build && npm --prefix Client run build",
+    "test": "npm --prefix Server run test:e2e && npm --prefix Client run test:e2e"
+  }
+}
