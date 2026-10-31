@@ -1,5 +1,48 @@
 import { expect, test } from '@playwright/test';
 
+test('homepage keeps one heading scale and equally sized collection photographs', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('.home-page .collection-story-card')).toHaveCount(3);
+  await expect(page.locator('.home-page .journal-card')).toHaveCount(3);
+  await page.locator('.home-page img').evaluateAll((images) =>
+    Promise.all(
+      images.map(async (element) => {
+        const image = element as HTMLImageElement;
+        image.loading = 'eager';
+        await image.decode();
+      }),
+    ),
+  );
+  const metrics = await page.evaluate(() => ({
+    sections: [...document.querySelectorAll('.home-page>section h2:not(.hero-title)')].map(
+      (element) => parseFloat(getComputedStyle(element).fontSize),
+    ),
+    hero: parseFloat(getComputedStyle(document.querySelector('.hero-content h1')!).fontSize),
+    secondHero: parseFloat(getComputedStyle(document.querySelector('.hero-title')!).fontSize),
+    collectionImages: [...document.querySelectorAll('.collection-story-image')].map(
+      (element) => element.getBoundingClientRect().height,
+    ),
+    journalImages: [...document.querySelectorAll('.home-page .journal-image')].map(
+      (element) => element.getBoundingClientRect().height,
+    ),
+    overflow: document.documentElement.scrollWidth - innerWidth,
+  }));
+  expect(new Set(metrics.sections).size).toBe(1);
+  expect(metrics.sections[0]).toBe(isMobile ? 34 : 44);
+  expect(metrics.hero).toBeGreaterThan(metrics.sections[0]);
+  expect(metrics.secondHero).toBe(metrics.hero);
+  expect(
+    Math.max(...metrics.collectionImages) - Math.min(...metrics.collectionImages),
+  ).toBeLessThanOrEqual(1);
+  expect(
+    Math.max(...metrics.journalImages) - Math.min(...metrics.journalImages),
+  ).toBeLessThanOrEqual(1);
+  expect(metrics.overflow).toBeLessThanOrEqual(1);
+});
+
 test('campaign preserves the complete photograph across screen sizes', async ({
   page,
   isMobile,

@@ -4,6 +4,8 @@ All runtime photographs are served from `Client/public/images`. Fonts are self-h
 
 The current visual redesign adds **28 generated photographs**, including separate coastal desktop/mobile campaigns and 24 distinct product views. Saved paths and complete prompt sets are recorded in [DESIGN_ASSETS.md](DESIGN_ASSETS.md). These replace the unrelated starter product images. Photographs now flow at their native proportions, with no letterbox backgrounds; curated product frames use matching 3:4 photographs.
 
+The latest homepage revision adds three more compositions: `hero-coast-wide.webp`, `campaign-editorial-wide.webp` and `home-material-study.webp`. The panoramic campaigns preserve full silhouettes; the landscape material study preserves the entire fabric stack. Exact edit prompts and saved paths are documented in [DESIGN_ASSETS.md](DESIGN_ASSETS.md#homepage-photography-and-proportions).
+
 ## Generated campaign
 
 - Asset: `Client/public/images/campaign-editorial.webp`
