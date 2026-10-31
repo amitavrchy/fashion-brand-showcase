@@ -11,14 +11,18 @@ export function Photo({
   className = '',
   priority = false,
   sizes = '(max-width: 700px) 100vw, 50vw',
+  mobileSrc,
+  onLoad,
 }: {
   src: string;
   alt: string;
   className?: string;
   priority?: boolean;
   sizes?: string;
+  mobileSrc?: string;
+  onLoad?: React.ReactEventHandler<HTMLImageElement>;
 }) {
-  return (
+  const photograph = (
     <Image
       src={src}
       alt={alt}
@@ -26,11 +30,13 @@ export function Photo({
       sizes={sizes}
       loading={priority ? 'eager' : 'lazy'}
       fetchPriority={priority ? 'high' : undefined}
-      style={src.includes('campaign-editorial') ? { objectPosition: '78% center' } : undefined}
+      style={{ objectFit: 'contain', objectPosition: 'center' }}
+      onLoad={onLoad}
       unoptimized={src.startsWith('https:') && !src.startsWith('https://images.unsplash.com/')}
       className={`photo ${className}`}
     />
   );
+  return mobileSrc ? <picture><source media="(max-width: 600px)" srcSet={mobileSrc} />{photograph}</picture> : photograph;
 }
 export function ArrowLink({
   href,

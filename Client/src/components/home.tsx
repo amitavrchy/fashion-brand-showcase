@@ -61,6 +61,7 @@ export function HomePage() {
                 <div className="hero-photo">
                   <Photo
                     src={c.image}
+                    mobileSrc={c.image === '/images/campaign-editorial.webp' ? '/images/campaign-portrait.webp' : undefined}
                     alt="An exploration of form, movement and contemporary style"
                     priority={i === 0}
                     sizes="100vw"

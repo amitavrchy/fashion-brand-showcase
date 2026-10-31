@@ -2,10 +2,11 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { HotspotImage } from './hotspot-image';
 import { api, ApiError, money } from '@/lib/api';
 import type { JournalPost, Lookbook, Product, StoreLocation } from '@/lib/types';
 import { ArrowLink, EmptyState, ErrorState, Loading, Modal, Photo, Reveal } from './ui';
@@ -63,9 +64,7 @@ export function LookbookPage({ slug }: { slug: string }) {
         <div>
           <p className="eyebrow">The autumn / winter 2026 lookbook</p>
           <h1>
-            A study
-            <br />
-            in <em>stillness.</em>
+            {query.data.title}
           </h1>
         </div>
         <p>
@@ -77,24 +76,7 @@ export function LookbookPage({ slug }: { slug: string }) {
         <div className="lookbook-chapters">
           {query.data.chapters.map((chapter) => (
             <article className="look-chapter" key={chapter.id}>
-              <div className="look-chapter-image">
-                <Photo
-                  src={chapter.imageUrl}
-                  alt={chapter.caption}
-                  sizes="(max-width: 700px) 100vw, 65vw"
-                />
-                {chapter.hotspots.map((h) => (
-                  <button
-                    className="hotspot"
-                    key={h.id}
-                    style={{ left: `${h.xPct}%`, top: `${h.yPct}%` }}
-                    onClick={() => setSelected(h.product)}
-                    aria-label={`Shop ${h.product.name}`}
-                  >
-                    <Plus size={20} strokeWidth={1.3} />
-                  </button>
-                ))}
-              </div>
+              <HotspotImage chapter={chapter} onSelect={setSelected} />
               <p>
                 <span>{chapter.caption}</span>
                 <span>
