@@ -4,6 +4,7 @@ import { Providers } from '@/components/providers';
 import { Shell } from '@/components/shell';
 import './globals.css';
 import './refinement.css';
+import './site-layout.css';
 import './homepage.css';
 
 const sans = Manrope({

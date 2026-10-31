@@ -213,51 +213,105 @@ export function HomePage() {
       <CollectionStories catalog={catalog.data} />
 
       <section className="lookbook-teaser section-pad">
-        <Reveal className="lookbook-copy">
+        <Reveal className="editorial-section-heading">
           <div>
             <p className="eyebrow">The autumn / winter lookbook</p>
             <h2>
               A study in <em>stillness.</em>
             </h2>
           </div>
-          <div>
+          <p>
+            The seasonal wardrobe, seen differently. Between structure, softness and everyday life.
+          </p>
+        </Reveal>
+        <Reveal className="lookbook-feature">
+          <div className="lookbook-figure">
+            <div className="lookbook-image">
+              <Photo
+                src="/images/campaign-editorial.webp"
+                alt="A complete camel coat silhouette beside warm limestone architecture"
+                sizes="(max-width: 800px) 90vw, 57vw"
+              />
+            </div>
+            <p className="editorial-photo-caption">
+              The autumn / winter story <span>2026</span>
+            </p>
+          </div>
+          <div className="lookbook-copy">
+            <p className="eyebrow">Five chapters. One point of view.</p>
+            <h3>
+              A quieter kind
+              <br />
+              of <em>statement.</em>
+            </h3>
             <p>
-              Between structure and softness. Discover the collection, one quiet chapter at a time.
+              Sculptural coats, fluid tailoring and layers with a natural ease. A collection that
+              leaves room for the person wearing it.
+            </p>
+            <p>
+              Explore the photographs. Discover the details. Find the pieces that become your own.
             </p>
             <ArrowLink href="/lookbook/a-study-in-stillness">Explore the lookbook</ArrowLink>
           </div>
         </Reveal>
-        <div className="lookbook-image">
-          <Photo
-            src="/images/campaign-editorial-wide.webp"
-            mobileSrc="/images/campaign-editorial.webp"
-            alt="A full-length camel coat silhouette against warm limestone architecture"
-            sizes="(max-width: 600px) 90vw, 100vw"
-          />
-        </div>
       </section>
 
       <section className="materials-section section-pad">
-        <Reveal className="materials-copy">
-          <p className="eyebrow">Materials with meaning</p>
-          <h2>
-            Good things
-            <br />
-            take <em>care.</em>
-          </h2>
+        <Reveal className="editorial-section-heading">
+          <div>
+            <p className="eyebrow">Materials with meaning</p>
+            <h2>
+              Good things take <em>care.</em>
+            </h2>
+          </div>
           <p>
-            Natural fibres. Thoughtful construction. Pieces that feel better the more you know them.
-            Discover the materials and small rituals behind a wardrobe made to stay.
+            It begins with how a fabric feels. Natural textures, thoughtful construction and
+            character that grows with time.
           </p>
-          <ArrowLink href="/about#our-commitments">Our approach to care</ArrowLink>
         </Reveal>
-        <Reveal className="materials-photo">
-          <Photo
-            src="/images/home-material-study.webp"
-            alt="Natural cashmere, wool and silk, arranged in a considered material study"
-            sizes="(max-width: 600px) 100vw, 50vw"
-          />
-        </Reveal>
+        <div className="materials-layout">
+          <Reveal className="materials-figure">
+            <div className="materials-photo">
+              <Photo
+                src="/images/home-material-study.webp"
+                alt="Complete folded stack of cashmere, wool and silk with an olive twig and wooden spool"
+                sizes="(max-width: 800px) 90vw, 51vw"
+              />
+            </div>
+            <p className="editorial-photo-caption">Natural fibres. Lasting character.</p>
+          </Reveal>
+          <Reveal className="materials-copy" delay={0.08}>
+            <div className="material-detail-list">
+              {[
+                {
+                  title: 'Wool & cashmere',
+                  body: 'Gentle warmth, beautiful drape. Soft layers to return to, season after season.',
+                  href: '/collections?category=Knitwear',
+                },
+                {
+                  title: 'Cotton & linen',
+                  body: 'Honest textures and a lighter touch. Everyday pieces with room to breathe.',
+                  href: '/collections/weekend-notes',
+                },
+                {
+                  title: 'Considered leather',
+                  body: 'Useful shapes, quiet details. Objects that become more personal with time.',
+                  href: '/collections/objects-of-affection',
+                },
+              ].map((material, index) => (
+                <Link className="material-detail" key={material.title} href={material.href}>
+                  <span className="material-index">0{index + 1}</span>
+                  <div>
+                    <h3>{material.title}</h3>
+                    <p>{material.body}</p>
+                  </div>
+                  <ArrowUpRight size={20} />
+                </Link>
+              ))}
+            </div>
+            <ArrowLink href="/about#our-commitments">Our approach to care</ArrowLink>
+          </Reveal>
+        </div>
       </section>
 
       <section className="journal-section section-pad">

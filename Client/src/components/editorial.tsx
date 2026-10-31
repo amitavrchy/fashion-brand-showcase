@@ -27,7 +27,7 @@ export function LookbookPage({ slug }: { slug: string }) {
         const section = scope.current?.querySelector('.lookbook-scroll');
         const track = scope.current?.querySelector<HTMLElement>('.lookbook-chapters');
         if (!track || !section) return;
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+        const distance = () => Math.max(0, track.scrollWidth - section.clientWidth);
         gsap.to(track, {
           x: () => -distance(),
           ease: 'none',

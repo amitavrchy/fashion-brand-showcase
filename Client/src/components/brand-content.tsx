@@ -7,13 +7,11 @@ import { ArrowLink, Photo, Reveal } from './ui';
 export function CollectionStories({ catalog }: { catalog?: Catalog }) {
   if (!catalog) return null;
   const featuredSlugs = ['autumn-winter', 'the-permanent-collection', 'objects-of-affection'];
-  const featured = [...catalog.collections]
-    .sort((a, b) => {
-      const rank = (slug: string) =>
-        featuredSlugs.includes(slug) ? featuredSlugs.indexOf(slug) : featuredSlugs.length;
-      return rank(a.slug) - rank(b.slug);
-    })
-    .slice(0, 3);
+  const collections = [...catalog.collections].sort((a, b) => {
+    const rank = (slug: string) =>
+      featuredSlugs.includes(slug) ? featuredSlugs.indexOf(slug) : featuredSlugs.length;
+    return rank(a.slug) - rank(b.slug);
+  });
   return (
     <section className="collection-stories section-pad">
       <Reveal className="section-heading">
@@ -25,20 +23,15 @@ export function CollectionStories({ catalog }: { catalog?: Catalog }) {
         </div>
         <ArrowLink href="/collections">Every considered piece</ArrowLink>
       </Reveal>
-      <div
-        className="collection-story-grid"
-        role="region"
-        aria-label="Featured collections"
-        tabIndex={0}
-      >
-        {featured.map((collection, index) => (
+      <div className="collection-story-grid" role="region" aria-label="Explore all collections">
+        {collections.map((collection, index) => (
           <Reveal key={collection.id} delay={(index % 3) * 0.06}>
             <Link className="collection-story-card" href={`/collections/${collection.slug}`}>
               <div className="collection-story-image">
                 <Photo
                   src={collection.heroImage}
                   alt={`${collection.title} — explore the complete collection`}
-                  sizes="(max-width: 600px) 100vw, 33vw"
+                  sizes="(max-width: 1000px) 44vw, 29vw"
                 />
                 <span className="round-arrow">
                   <ArrowUpRight size={21} />
@@ -56,20 +49,6 @@ export function CollectionStories({ catalog }: { catalog?: Catalog }) {
             </Link>
           </Reveal>
         ))}
-      </div>
-      <div className="collection-additional">
-        {catalog.collections
-          .filter((c) => !featured.some((f) => f.id === c.id))
-          .map((collection) => (
-            <Link
-              key={collection.id}
-              className="text-link"
-              href={`/collections/${collection.slug}`}
-            >
-              {collection.title}
-              <ArrowUpRight size={17} />
-            </Link>
-          ))}
       </div>
     </section>
   );
@@ -136,27 +115,45 @@ export function MaterialLibrary() {
 export function AtelierVisit() {
   return (
     <section className="atelier-visit">
-      <div className="atelier-visit-photo">
-        <Photo
-          src="/images/architecture.jpg"
-          alt="A warm, considered interior with room to slow down"
-          sizes="(max-width: 600px) 100vw, 55vw"
-        />
-      </div>
-      <Reveal className="atelier-visit-copy">
-        <p className="eyebrow">A place to make time</p>
-        <h2>
-          Come a little
-          <br />
-          <em>closer.</em>
-        </h2>
-        <p>
-          Some things are better understood in person. The feel of a fabric. The fall of a sleeve. A
-          conversation about the piece you will wear most.
-        </p>
-        <p>Paris · Copenhagen · London · Amsterdam · Milan · Berlin.</p>
-        <ArrowLink href="/stores">Explore our six spaces</ArrowLink>
+      <Reveal className="editorial-section-heading">
+        <div>
+          <p className="eyebrow">A place to make time</p>
+          <h2>
+            Come a little <em>closer.</em>
+          </h2>
+        </div>
+        <p>A slower pace. A personal point of view. Step into the world of Atelier Lune.</p>
       </Reveal>
+      <div className="atelier-visit-layout">
+        <Reveal className="atelier-visit-figure">
+          <div className="atelier-visit-photo">
+            <Photo
+              src="/images/architecture.jpg"
+              alt="Sunlight, natural textures and comfortable seating in a considered interior"
+              sizes="(max-width: 800px) 90vw, 50vw"
+            />
+          </div>
+          <p className="editorial-photo-caption">Room to slow down. Space to discover.</p>
+        </Reveal>
+        <Reveal className="atelier-visit-copy" delay={0.08}>
+          <p className="eyebrow">An invitation, in six cities</p>
+          <h3>
+            Your wardrobe,
+            <br />
+            <em>in person.</em>
+          </h3>
+          <p>
+            The feel of a fabric. The fall of a sleeve. Some things are better understood in person.
+            Take your time, discover the collection, and find what feels like you.
+          </p>
+          <ul className="atelier-city-list" aria-label="Our concept store cities">
+            {['Paris', 'Copenhagen', 'London', 'Amsterdam', 'Milan', 'Berlin'].map((city) => (
+              <li key={city}>{city}</li>
+            ))}
+          </ul>
+          <ArrowLink href="/stores">Explore our six spaces</ArrowLink>
+        </Reveal>
+      </div>
     </section>
   );
 }

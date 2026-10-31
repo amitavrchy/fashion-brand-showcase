@@ -91,6 +91,24 @@ export async function refreshPhotography(db) {
     where: { heroImage: '/images/campaign-portrait.webp' },
     data: { heroImage: '/images/hero-coast-mobile.webp' },
   });
+  // The complete six-card collection edit needs a distinct cover for every story.
+  for (const [slug, original, heroImage] of [
+    [
+      'city-rituals',
+      '/images/hero-coast-mobile.webp',
+      '/images/studio-tailoring.webp',
+    ],
+    [
+      'the-soft-edit',
+      '/images/studio-knit.webp',
+      '/images/studio-cardigan.webp',
+    ],
+  ]) {
+    await db.collection.updateMany({
+      where: { slug, heroImage: original },
+      data: { heroImage },
+    });
+  }
   await db.journalPost.updateMany({
     where: {
       coverImage: {

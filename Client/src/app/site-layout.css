@@ -1,0 +1,73 @@
+/* A single container contract for the header and every page. */
+:root {
+  --content-width: 90%;
+  --image-radius: 14px;
+}
+
+#main {
+  --page-gutter: 0px;
+  width: var(--content-width);
+  margin-inline: auto;
+  min-width: 0;
+}
+#main
+  :is(
+    .page-content,
+    .admin-page,
+    .account-page,
+    .cart-layout,
+    .checkout-layout,
+    .checkout-heading,
+    .care-layout
+  ) {
+  width: 100%;
+  max-width: none;
+}
+.header-shell {
+  background: var(--ivory);
+  border-bottom: 1px solid var(--line);
+}
+.header-shell .site-header {
+  width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: 0;
+  border-bottom: 0;
+}
+.announcement,
+.site-footer {
+  padding-inline: 5%;
+}
+
+/* Subtle corners follow the photograph without changing its proportions. */
+img {
+  border-radius: var(--image-radius);
+}
+:is(
+  .product-image,
+  .gallery-main,
+  .gallery-thumbnail,
+  .journal-image,
+  .journal-feature-image,
+  .article-hero,
+  .stores-photo,
+  .story-hero,
+  .auth-photo,
+  .social-photo,
+  .collection-story-image,
+  .material-library-image,
+  .atelier-visit-photo,
+  .lookbook-index-image,
+  .look-chapter-image,
+  .look-panel-photo,
+  .menu-feature,
+  .bag-item-image
+) {
+  border-radius: var(--image-radius);
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --image-radius: 10px;
+  }
+}
