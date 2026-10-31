@@ -1,13 +1,23 @@
 # ATELIER LUNE
 
-A complete contemporary fashion storefront built from [PROJECT_SPEC.md](PROJECT_SPEC.md). Next.js 16 / React 19 on the client; NestJS, Prisma and PostgreSQL on the API.
+A complete contemporary fashion storefront built from [PROJECT_SPEC.md](Server/docs/PROJECT_SPEC.md). Next.js 16 / React 19 on the client; NestJS, Prisma and PostgreSQL on the API.
+
+## Repository layout
+
+```text
+Client/     Storefront, assets, design documentation and browser checks
+Server/     API, database, project documentation and workspace scripts
+README.md   Shared setup and deployment guide
+```
+
+Each application has its own package manifest, lockfile, environment template and ignore/format configuration. Shared setup and development commands live in `Server/scripts/workspace`; there is no root npm package. Local screenshots and Lighthouse reports are ignored under `Client/.data`, while private payment review artifacts remain ignored under `Server/.data/review/stripe`.
 
 ## Run locally
 
 Requires Node.js 22+ and npm. From the repository root:
 
 ```sh
-npm run setup
+npm --prefix Server run setup
 ```
 
 This installs the locked dependencies, creates missing local environment files and generates a random JWT secret. It preserves existing environment files. If you already have `Server/.env`, ensure `JWT_SECRET` contains at least 32 random characters and is not the example placeholder.
@@ -15,7 +25,7 @@ This installs the locked dependencies, creates missing local environment files a
 Start PostgreSQL in one terminal:
 
 ```sh
-npm run db
+npm --prefix Server run db:local
 ```
 
 This runs a real, persistent PostgreSQL server on `127.0.0.1:5432`, stored under `Server/.data/postgres`. It is a local development convenience. Alternatively, use your own PostgreSQL instance or `docker compose -f Server/docker-compose.yml up -d`, and set `DATABASE_URL` in `Server/.env`. Only one database should use port 5432.
@@ -23,8 +33,8 @@ This runs a real, persistent PostgreSQL server on `127.0.0.1:5432`, stored under
 In another terminal:
 
 ```sh
-npm run db:prepare
-npm run dev
+npm --prefix Server run db:prepare
+npm --prefix Server run dev:all
 ```
 
 - Storefront: http://localhost:3000
@@ -95,23 +105,23 @@ npm --prefix Client run test:e2e
 The browser suite starts its own API on port 4002 and Next.js on port 3003, using a separate `.next-test` directory. Its dedicated browser test database is reset when the test server starts. The test-only administrator credentials in the browser fixture are never provisioned in the development database. Automated suites inject a fake Stripe gateway in the test bootstrap, verify signed fixture events and never spend real funds or require Stripe credentials. The production application has no fixture payment endpoints. Real Stripe test-card payment, signed local webhook, decline and cancellation are also checked separately.
 
 ```sh
-npm run build
+npm --prefix Server run build:all
 npm --prefix Client run lint
 npm --prefix Server run lint
 ```
 
-Verification results are recorded in [BUILD_PROGRESS.md](BUILD_PROGRESS.md). Run `npm --prefix Client run audit` against a running production preview to write a fresh HTML/JSON Lighthouse report to `.data/quality/`; set `AUDIT_URL` when the preview uses port 3001. Scores depend on the deployment environment.
+Verification results are recorded in [BUILD_PROGRESS.md](Server/docs/BUILD_PROGRESS.md). Run `npm --prefix Client run audit` against a running production preview to write a fresh HTML/JSON Lighthouse report to `Client/.data/quality/`; set `AUDIT_URL` when the preview uses port 3001. Scores depend on the deployment environment.
 
 ## Production configuration
 
 Use managed PostgreSQL, apply `npm --prefix Server run db:migrate`, provision an administrator deliberately, and configure a strong `JWT_SECRET`. Set `NODE_ENV=production`, `HOST=0.0.0.0` when binding inside a container, `CLIENT_ORIGIN` to the HTTPS storefront origin, and `API_URL` on Next.js to the API origin. Set `NEXT_PUBLIC_SITE_URL` before the client build for canonical social and sitemap URLs. Production session cookies require HTTPS.
 
-Build with `npm run build`; start each service with `npm --prefix Server run start:prod` and `npm --prefix Client start`. The API Dockerfile is built with `Server` as its context. Never expose the development database or its example credentials to the public internet.
+Build with `npm --prefix Server run build:all`; start each service with `npm --prefix Server run start:prod` and `npm --prefix Client start`. The API Dockerfile is built with `Server` as its context. Never expose the development database or its example credentials to the public internet.
 
 Keep uploaded photography on durable storage. `MEDIA_DIRECTORY` defaults to `.data/uploads` under the server working directory; the Docker image uses `/app/.data/uploads` as a writable volume. Back up this directory with PostgreSQL, or supply your deployment's persistent media path. Deleting an editorial entry does not delete an uploaded file that another entry may still use.
 
 Payments currently accept Stripe test keys only. For a deployed test environment, configure a Stripe endpoint at `https://<your-api>/payments/webhook` for `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`, and set that endpoint's `STRIPE_WEBHOOK_SECRET`. The CLI secret belongs only to local forwarding. Live charging requires an intentional production payment rollout.
 
-The application records test orders without arranging physical fulfilment or sending transactional emails. Newsletter signup persists the address; connecting an email provider is a future integration. Store locations, brand history and product imagery are concept content. Replace them with verified brand information before commercial launch. Asset provenance and generated campaign prompts are in [ASSETS.md](ASSETS.md).
+The application records test orders without arranging physical fulfilment or sending transactional emails. Newsletter signup persists the address; connecting an email provider is a future integration. Store locations, brand history and product imagery are concept content. Replace them with verified brand information before commercial launch. Asset provenance and generated campaign prompts are in [ASSETS.md](Client/docs/ASSETS.md).
 
 The in-memory API rate limiter is suitable for a single instance. A multi-instance deployment should share rate-limit storage and configure proxy trust for its infrastructure.

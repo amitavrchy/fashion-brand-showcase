@@ -2,13 +2,17 @@ import { spawn, execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const children = [
-  spawn(process.execPath, ['node_modules/@nestjs/cli/bin/nest.js', 'start', '--watch'], {
-    cwd: resolve(root, 'Server'),
-    stdio: 'inherit',
-    windowsHide: true,
-  }),
+  spawn(
+    process.execPath,
+    ['node_modules/@nestjs/cli/bin/nest.js', 'start', '--watch'],
+    {
+      cwd: resolve(root, 'Server'),
+      stdio: 'inherit',
+      windowsHide: true,
+    },
+  ),
   spawn(process.execPath, ['node_modules/next/dist/bin/next', 'dev'], {
     cwd: resolve(root, 'Client'),
     stdio: 'inherit',

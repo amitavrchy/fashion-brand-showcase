@@ -29,3 +29,17 @@ Set `STRIPE_SECRET_KEY` in ignored `.env`, then run `npm run stripe:listen` in a
 `POST /admin/media` accepts JPEG/PNG/WebP up to 8 MB, validates decoded dimensions (minimum 400 × 400), rejects animated/disguised files and emits metadata-free WebP without cropping. `/media/:file` serves the resulting UUID filename. `MEDIA_DIRECTORY` must be persistent and writable; it defaults to `.data/uploads`. Mount `/app/.data/uploads` in Docker.
 
 `POST /admin/orders/:id/ship` only accepts verified paid orders. `/admin/orders/:id/cancel` expires unpaid Stripe reservations and restores stock once; it never pretends a paid order was refunded. `npm run admin:local` provisions a local-only administrator with generated credentials in ignored `.data/admin-access.txt`, without changing existing administrator credentials.
+
+## Shared workspace commands
+
+Run these from `Server`, or use `npm --prefix Server run <command>` from the repository root:
+
+```sh
+npm run setup
+npm run db:prepare
+npm run dev:all
+npm run build:all
+npm run test:all
+```
+
+`setup` installs both applications and creates only missing local environment files. The `:all` commands coordinate both folders; the normal API build/start commands remain independent for deployment. Project specifications and verification notes are in [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) and [docs/BUILD_PROGRESS.md](docs/BUILD_PROGRESS.md).

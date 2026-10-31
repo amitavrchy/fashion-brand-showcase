@@ -5,3 +5,22 @@ node_modules
 /generated/prisma
 
 /generated
+
+# Local artifacts and secrets (scoped to this application)
+node_modules/
+.next/
+.next-test/
+dist/
+out/
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.log
+.DS_Store
+!**/.env.example
+.data/
+playwright-report/
+test-results/
+*.tsbuildinfo

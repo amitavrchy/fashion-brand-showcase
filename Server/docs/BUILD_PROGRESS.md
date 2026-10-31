@@ -44,7 +44,13 @@ The eight-collection follow-up adds After hours and Tailored ease, each with two
 - [x] Production dependency audits: zero reported vulnerabilities in both applications.
 - [x] Lighthouse mobile homepage: Performance 85, Accessibility 100, Best Practices 100, SEO 100; cumulative layout shift 0.
 
-The latest Lighthouse result was collected against the redesigned production build at `http://localhost:3001` on 31 October 2026: FCP 0.9s, LCP 4.2s, total blocking time 100ms and CLS 0. Responsive sources supply intrinsic dimensions before download. Production checks at 1920 and 390px confirm matching header, body and primary content widths of 1728px and 351px respectively. Homepage screenshots were inspected at desktop and mobile sizes; geometry checks at 1440, 768, 390 and 360px found no horizontal overflow. The campaign stacks its copy below the complete image through 700px to avoid overlapping controls on narrow tablets. Earlier production smoke checks also confirmed nine working admin sections, 24 distinct primary product images, no page errors and no text below 14px on desktop/mobile admin views. Scores vary with hosting, hardware and network conditions. Full local audit artifacts are written to `.data/quality/` by `npm --prefix Client run audit`.
+The latest Lighthouse result was collected against the redesigned production build at `http://localhost:3001` on 31 October 2026: FCP 0.9s, LCP 4.2s, total blocking time 100ms and CLS 0. Responsive sources supply intrinsic dimensions before download. Production checks at 1920 and 390px confirm matching header, body and primary content widths of 1728px and 351px respectively. Homepage screenshots were inspected at desktop and mobile sizes; geometry checks at 1440, 768, 390 and 360px found no horizontal overflow. The campaign stacks its copy below the complete image through 700px to avoid overlapping controls on narrow tablets. Earlier production smoke checks also confirmed nine working admin sections, 24 distinct primary product images, no page errors and no text below 14px on desktop/mobile admin views. Scores vary with hosting, hardware and network conditions. Full local audit artifacts are written to `Client/.data/quality/` by `npm --prefix Client run audit`.
+
+## Deployment folder organization
+
+The repository root contains `Client/`, `Server/` and `README.md`, plus Git metadata. Asset documentation and local browser/audit artifacts belong to Client; project documentation, shared workspace scripts and private payment review artifacts belong to Server. Each application owns its package manifest, lockfile, ignore rules and formatting configuration.
+
+The relocated scripts and documentation links were checked. `npm --prefix Server run build:all` successfully builds both applications. Environment files, administrator credentials and local artifacts remain ignored. Root setup/build commands in the README now point to the Server workspace helpers; individual Client and Server deployment commands remain available.
 
 ## Deliberate limits
 
@@ -54,4 +60,4 @@ The full dependency audit still reports advisories in inherited development lint
 
 Docker is not installed in the development environment, so the container image was not built here. The application builds and all integration checks were run directly on Windows with a real local PostgreSQL instance.
 
-See [README.md](README.md) for setup, administrator provisioning, production environment configuration and test commands. See [ASSETS.md](ASSETS.md) for image provenance and the generated campaign prompt.
+See [README.md](../../README.md) for setup, administrator provisioning, production environment configuration and test commands. See [ASSETS.md](../../Client/docs/ASSETS.md) for image provenance and the generated campaign prompt.

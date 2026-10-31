@@ -4,16 +4,20 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const npmCli = process.env.npm_execpath;
-if (!npmCli) throw new Error('Run this script with npm run setup.');
+if (!npmCli)
+  throw new Error('Run this script with npm --prefix Server run setup.');
 for (const [directory, target] of [
   ['Server', '.env'],
   ['Client', '.env.local'],
 ]) {
   const destination = resolve(root, directory, target);
   if (!existsSync(destination)) {
-    const template = readFileSync(resolve(root, directory, '.env.example'), 'utf8');
+    const template = readFileSync(
+      resolve(root, directory, '.env.example'),
+      'utf8',
+    );
     writeFileSync(
       destination,
       template.replace(
@@ -31,5 +35,5 @@ for (const [directory, target] of [
   if (result.status !== 0) process.exit(result.status || 1);
 }
 console.log(
-  'Setup ready. Start PostgreSQL with npm run db; then npm run db:prepare and npm run dev.',
+  'Setup ready. Run npm --prefix Server run db:local; then npm --prefix Server run db:prepare and npm --prefix Server run dev:all from the repository root.',
 );

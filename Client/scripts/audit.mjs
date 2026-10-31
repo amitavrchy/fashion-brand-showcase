@@ -5,7 +5,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const output = resolve(dirname(fileURLToPath(import.meta.url)), '../../.data/quality');
+const output = resolve(dirname(fileURLToPath(import.meta.url)), '../.data/quality');
 await mkdir(output, { recursive: true });
 const url = process.env.AUDIT_URL || 'http://localhost:3000';
 const chrome = await chromeLauncher.launch({
