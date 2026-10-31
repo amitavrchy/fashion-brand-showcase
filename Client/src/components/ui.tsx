@@ -60,7 +60,13 @@ export function Photo({
   );
   return mobileSrc ? (
     <picture style={{ display: 'block', width: '100%' }}>
-      <source media="(max-width: 600px)" srcSet={mobileProps?.srcSet || mobileSrc} sizes={sizes} />
+      <source
+        media="(max-width: 600px)"
+        srcSet={mobileProps?.srcSet || mobileSrc}
+        sizes={sizes}
+        width={mobileDimensions?.[0]}
+        height={mobileDimensions?.[1]}
+      />
       {photograph}
     </picture>
   ) : (

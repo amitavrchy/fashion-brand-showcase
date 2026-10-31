@@ -19,4 +19,6 @@ The API is reached through a same-origin `/api` proxy configured by `API_URL`. N
 
 Checkout redirects to Stripe-hosted test payment. The return page retrieves an authorized server-verified receipt and only removes purchased quantities from the bag after successful payment. Cancellation keeps the bag. A Stripe publishable key is unnecessary for this hosted redirect flow; secret keys belong exclusively on the API.
 
-Photography uses complete-frame containment, a dedicated mobile hero portrait and a hotspot overlay measured against the displayed image bounds. The content seed supplies 24 products, six collections, twelve journal posts and three lookbooks.
+Photography uses native proportions, dedicated desktop/mobile hero compositions and a hotspot overlay measured against the complete image bounds. The content seed supplies 24 distinct product photographs, six collections, twelve journal posts and three lookbooks. Run `node scripts/image-manifest.mjs` after adding bundled photographs to record their intrinsic dimensions.
+
+`/admin` provides nine protected management sections, including image uploads, journal scheduling, chapter/product-point editing, stores, fulfilment, audience export and storefront copy. Uploads use multipart requests through the same-origin proxy. See the root README for the generated local administrator access file.

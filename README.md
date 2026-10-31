@@ -37,6 +37,10 @@ The Next.js server proxies `/api/*` to the API, so session cookies stay HTTP-onl
 
 ## Administrator access
 
+The requested local administrator has been provisioned for this review. Open the ignored **`Server/.data/admin-access.txt`** file for its generated sign-in details, sign in at `/account`, then visit `/admin`. Credentials are never committed or printed in setup logs.
+
+On a fresh local database, `npm --prefix Server run admin:local` creates an administrator with a random password and writes that private local file. It only accepts a local development database and leaves any existing administrator unchanged.
+
 There are no default administrator credentials. Add `ADMIN_EMAIL` and `ADMIN_PASSWORD` (at least 12 characters) to your ignored `Server/.env`, then run:
 
 ```sh
@@ -49,13 +53,14 @@ Sign in through `/account`, then open `/admin`. Seeding is idempotent and preser
 
 - Editorial campaign carousel, responsive mega-menu, material-aware search and newsletter persistence.
 - Collections with URL-backed category, color, available-size filters, sorting and pagination.
-- Complete-frame photography on every device, a dedicated mobile campaign portrait, second-image hover, zoom, keyboard-accessible variants, size guide, stock states and fabric/care accordions.
+- A new coastal campaign with dedicated desktop/mobile photography, intrinsic image proportions without letterbox backgrounds, 24 distinct garment photographs, zoom, keyboard-accessible variants, size guide, stock states and fabric/care accordions. Secondary-image hover is supported when administrators add another product view.
 - Redux bag with local persistence, editable quantities and a focus-trapped drawer.
 - Stripe-hosted test checkout, authoritative server prices, shipping calculation, stable retry keys and transactional stock reservations. Verified payment confirms the order; cancellation/expiry releases stock exactly once.
 - Three shoppable lookbooks with thirteen chapters, GSAP horizontal desktop navigation, touch-friendly mobile chapters and product panels. Hotspots stay aligned with the complete photograph.
 - Brand story, journal filtering/articles and city-filtered store locator with map directions.
 - Registration/sign-in, HTTP-only JWT sessions, persistent authenticated wishlist and account order history.
-- Protected product/variant, collection and campaign administration. Unpublishing preserves order history.
+- Nine protected management sections: products/variants, collections, desktop/mobile campaigns, journal publishing/scheduling, lookbooks with reorderable chapters and clickable product points, stores, order details and fulfilment, subscriber CSV export, and storefront settings. Product unpublishing preserves order history.
+- Image uploads validate and re-encode JPEG/PNG/WebP photographs, strip metadata, preserve complete proportions and save to persistent local media storage. Storefront settings control the announcement, homepage introduction, newsletter and contact email.
 - Self-hosted fonts, a 14px minimum UI text size, reduced-motion support, focus states, native accessible dialogs, product JSON-LD, metadata, sitemap and robots rules.
 - 24 pieces across six collections, twelve journal stories, six concept boutiques, material guides, wardrobe advice, brand stories and detailed care/service answers.
 
@@ -74,6 +79,8 @@ The wrapper uses the configured test key without printing it, forwards Checkout 
 Complete checkout with Stripe test card `4242 4242 4242 4242`, any future expiry, and any three-digit CVC. Card `4000 0000 0000 0002` exercises a declined payment. Use fictitious customer details. No real money is charged. See [Stripe's testing guide](https://docs.stripe.com/testing).
 
 The return page verifies the session with Stripe before showing success. Signed webhooks and periodic reconciliation also update orders when the browser closes. Receipt access requires the checkout browser's HTTP-only cookie or the owning account. Abandoned reservations expire after about 31 minutes and are reconciled every minute. Cancelling Checkout returns to a usable bag.
+
+The storefront displays one compact test-payment notice on checkout. Confirmation pages use normal order language; test-card instructions are kept in developer documentation.
 
 ## Verification
 
@@ -100,6 +107,8 @@ Verification results are recorded in [BUILD_PROGRESS.md](BUILD_PROGRESS.md). Run
 Use managed PostgreSQL, apply `npm --prefix Server run db:migrate`, provision an administrator deliberately, and configure a strong `JWT_SECRET`. Set `NODE_ENV=production`, `HOST=0.0.0.0` when binding inside a container, `CLIENT_ORIGIN` to the HTTPS storefront origin, and `API_URL` on Next.js to the API origin. Set `NEXT_PUBLIC_SITE_URL` before the client build for canonical social and sitemap URLs. Production session cookies require HTTPS.
 
 Build with `npm run build`; start each service with `npm --prefix Server run start:prod` and `npm --prefix Client start`. The API Dockerfile is built with `Server` as its context. Never expose the development database or its example credentials to the public internet.
+
+Keep uploaded photography on durable storage. `MEDIA_DIRECTORY` defaults to `.data/uploads` under the server working directory; the Docker image uses `/app/.data/uploads` as a writable volume. Back up this directory with PostgreSQL, or supply your deployment's persistent media path. Deleting an editorial entry does not delete an uploaded file that another entry may still use.
 
 Payments currently accept Stripe test keys only. For a deployed test environment, configure a Stripe endpoint at `https://<your-api>/payments/webhook` for `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`, and set that endpoint's `STRIPE_WEBHOOK_SECRET`. The CLI secret belongs only to local forwarding. Live charging requires an intentional production payment rollout.
 
