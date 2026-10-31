@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { seedExpandedContent } from './content.mjs';
 import { refreshPhotography } from './refresh-photography.mjs';
+import { seedCollectionEdits } from './collection-edits.mjs';
 
 const db = new PrismaClient();
 const photos = {
@@ -382,4 +383,6 @@ console.log(
 );
 await seedExpandedContent(db);
 await refreshPhotography(db);
+await seedCollectionEdits(db);
+console.log('Collection edit ready: eight collections with published pieces.');
 await db.$disconnect();

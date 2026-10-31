@@ -91,7 +91,7 @@ export async function refreshPhotography(db) {
     where: { heroImage: '/images/campaign-portrait.webp' },
     data: { heroImage: '/images/hero-coast-mobile.webp' },
   });
-  // The complete six-card collection edit needs a distinct cover for every story.
+  // The complete eight-card collection edit needs a distinct cover for every story.
   for (const [slug, original, heroImage] of [
     [
       'city-rituals',
