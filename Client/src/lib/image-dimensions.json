@@ -1,47 +1,182 @@
 {
-  "/images/architecture.jpg": [1400, 1050],
-  "/images/atelier.jpg": [1600, 1068],
-  "/images/bag.jpg": [1600, 1069],
-  "/images/campaign-editorial.webp": [1672, 941],
-  "/images/campaign-portrait-optimized.webp": [900, 1125],
-  "/images/campaign-portrait.webp": [1122, 1402],
-  "/images/campaign.jpg": [1600, 1067],
-  "/images/coat.jpg": [1600, 2400],
-  "/images/detail.jpg": [1600, 2400],
-  "/images/dress.jpg": [1600, 2400],
-  "/images/hero-coast-mobile.webp": [1086, 1448],
-  "/images/hero-coast.webp": [1672, 941],
-  "/images/knit.jpg": [1600, 2297],
-  "/images/landscape.jpg": [1600, 1067],
-  "/images/leather.jpg": [1400, 1867],
-  "/images/linen.jpg": [1400, 2098],
-  "/images/shirts.jpg": [1400, 933],
-  "/images/studio-bag.webp": [1086, 1448],
-  "/images/studio-belt.webp": [1000, 1333],
-  "/images/studio-blazer.webp": [1000, 1333],
-  "/images/studio-cardigan.webp": [1000, 1333],
-  "/images/studio-coat.webp": [1086, 1448],
-  "/images/studio-daydress.webp": [1000, 1333],
-  "/images/studio-detail.webp": [1086, 1448],
-  "/images/studio-dress.webp": [1086, 1448],
-  "/images/studio-knit.webp": [1086, 1448],
-  "/images/studio-knitvest.webp": [1000, 1333],
-  "/images/studio-leather.webp": [1086, 1448],
-  "/images/studio-linen.webp": [1086, 1448],
-  "/images/studio-merino.webp": [1000, 1333],
-  "/images/studio-mockneck.webp": [1000, 1333],
-  "/images/studio-overshirt.webp": [1000, 1333],
-  "/images/studio-oxford.webp": [1000, 1333],
-  "/images/studio-poplin.webp": [1000, 1333],
-  "/images/studio-pouch.webp": [1000, 1333],
-  "/images/studio-rib.webp": [1000, 1333],
-  "/images/studio-scarf.webp": [1000, 1333],
-  "/images/studio-silk.webp": [1000, 1333],
-  "/images/studio-tailoring.webp": [1086, 1448],
-  "/images/studio-tee.webp": [1000, 1333],
-  "/images/studio-trench.webp": [1000, 1333],
-  "/images/studio-wrap.webp": [1000, 1333],
-  "/images/studio-wrapdress.webp": [1000, 1333],
-  "/images/studio.jpg": [1400, 935],
-  "/images/tailoring.jpg": [1600, 2133]
+  "/images/architecture.jpg": [
+    1400,
+    1050
+  ],
+  "/images/atelier.jpg": [
+    1600,
+    1068
+  ],
+  "/images/bag.jpg": [
+    1600,
+    1069
+  ],
+  "/images/campaign-editorial.webp": [
+    1672,
+    941
+  ],
+  "/images/campaign-portrait-optimized.webp": [
+    900,
+    1125
+  ],
+  "/images/campaign-portrait.webp": [
+    1122,
+    1402
+  ],
+  "/images/campaign.jpg": [
+    1600,
+    1067
+  ],
+  "/images/coat.jpg": [
+    1600,
+    2400
+  ],
+  "/images/detail.jpg": [
+    1600,
+    2400
+  ],
+  "/images/dress.jpg": [
+    1600,
+    2400
+  ],
+  "/images/hero-coast-mobile.webp": [
+    900,
+    1200
+  ],
+  "/images/hero-coast.webp": [
+    1672,
+    941
+  ],
+  "/images/knit.jpg": [
+    1600,
+    2297
+  ],
+  "/images/landscape.jpg": [
+    1600,
+    1067
+  ],
+  "/images/leather.jpg": [
+    1400,
+    1867
+  ],
+  "/images/linen.jpg": [
+    1400,
+    2098
+  ],
+  "/images/shirts.jpg": [
+    1400,
+    933
+  ],
+  "/images/studio-bag.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-belt.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-blazer.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-cardigan.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-coat.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-daydress.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-detail.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-dress.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-knit.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-knitvest.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-leather.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-linen.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-merino.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-mockneck.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-overshirt.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-oxford.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-poplin.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-pouch.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-rib.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-scarf.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-silk.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-tailoring.webp": [
+    1086,
+    1448
+  ],
+  "/images/studio-tee.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-trench.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-wrap.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio-wrapdress.webp": [
+    1000,
+    1333
+  ],
+  "/images/studio.jpg": [
+    1400,
+    935
+  ],
+  "/images/tailoring.jpg": [
+    1600,
+    2133
+  ]
 }

@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, X } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image, { getImageProps } from 'next/image';
 import imageDimensions from '@/lib/image-dimensions.json';
 
 export function Photo({
@@ -24,6 +24,19 @@ export function Photo({
   onLoad?: React.ReactEventHandler<HTMLImageElement>;
 }) {
   const dimensions = (imageDimensions as Record<string, number[]>)[src] || [1200, 1600];
+  const mobileDimensions = mobileSrc
+    ? (imageDimensions as Record<string, number[]>)[mobileSrc] || [900, 1200]
+    : undefined;
+  const mobileProps =
+    mobileSrc && mobileDimensions
+      ? getImageProps({
+          src: mobileSrc,
+          alt,
+          width: mobileDimensions[0],
+          height: mobileDimensions[1],
+          sizes,
+        }).props
+      : undefined;
   const photograph = (
     <Image
       src={src}
@@ -47,7 +60,7 @@ export function Photo({
   );
   return mobileSrc ? (
     <picture style={{ display: 'block', width: '100%' }}>
-      <source media="(max-width: 600px)" srcSet={mobileSrc} />
+      <source media="(max-width: 600px)" srcSet={mobileProps?.srcSet || mobileSrc} sizes={sizes} />
       {photograph}
     </picture>
   ) : (

@@ -71,7 +71,7 @@ export async function refreshPhotography(db) {
     data: { accent: '#242820' },
   });
   await db.campaign.updateMany({
-    where: { id: 'campaign-permanent', accent: '#5C1F1F' },
+    where: { id: 'campaign-permanent', accent: { in: ['#5C1F1F', '#514339'] } },
     data: { accent: '#FFFDF6' },
   });
   await db.collection.updateMany({

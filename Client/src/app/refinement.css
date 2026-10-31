@@ -192,6 +192,9 @@
   object-fit: cover;
   filter: none;
 }
+.hero-photo .photo {
+  filter: none;
+}
 .hero-shade {
   background: linear-gradient(90deg, #f7eedb30, transparent 55%);
 }
@@ -248,7 +251,7 @@
 .hero-pagination button {
   color: inherit;
   border-bottom: 1px solid currentColor;
-  opacity: 0.55;
+  opacity: 0.8;
 }
 .hero-pagination .selected {
   color: inherit;

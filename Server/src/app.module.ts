@@ -11,7 +11,11 @@ import { APP_GUARD } from '@nestjs/core';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
+    // Browser regression suites share one IP and make hundreds of rapid page visits.
+    // Keep the production limit and endpoint-specific mutation limits intact.
+    ThrottlerModule.forRoot([
+      { ttl: 60_000, limit: process.env.NODE_ENV === 'test' ? 1200 : 120 },
+    ]),
     ShopModule,
   ],
   controllers: [AppController],

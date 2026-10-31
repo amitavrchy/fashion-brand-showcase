@@ -36,6 +36,15 @@ for (const args of [
 const db = new PrismaClient({ datasourceUrl: url.href });
 // This reset is limited to the named, dedicated browser test database above.
 await db.order.deleteMany();
+await db.lookbook.deleteMany({
+  where: { slug: { startsWith: 'browser-look-' } },
+});
+await db.journalPost.deleteMany({
+  where: { slug: { startsWith: 'browser-story-' } },
+});
+await db.store.deleteMany({
+  where: { name: { startsWith: 'Browser atelier ' } },
+});
 await db.variant.updateMany({ data: { stock: 8 } });
 await db.variant.updateMany({
   where: { id: { endsWith: '-0-4' } },
