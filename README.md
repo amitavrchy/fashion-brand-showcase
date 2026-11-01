@@ -4,10 +4,10 @@ Clothing as quiet architecture. A contemporary fashion storefront and the commer
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-111111?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5%20%7C%206-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-12-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%20%7C%2018-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Stripe](https://img.shields.io/badge/Stripe-test%20checkout-635BFF?logo=stripe&logoColor=white)](https://docs.stripe.com/testing)
 
 ## Live demo
@@ -56,7 +56,7 @@ Catalog copy, photography, and boutique locations are concept content. Payments 
 | Runtime | Node.js 22, Next.js 16, React 19 | Node.js 22, NestJS 12 |
 | Language | TypeScript | TypeScript |
 | UI | Tailwind CSS 4, Framer Motion, GSAP, Lenis, Embla | — |
-| Data | Redux Toolkit, React Query, React Hook Form, Zod | Prisma 6, PostgreSQL |
+| Data | Redux Toolkit, React Query, React Hook Form, Zod | Prisma 6, PostgreSQL 16 (Docker) or 18 (`db:local`) |
 | Payments | Hosted Checkout return page | Stripe test mode, signed webhooks |
 | Quality | ESLint, Playwright | oxlint, Vitest |
 
@@ -162,7 +162,7 @@ npm run start:dev     # http://127.0.0.1:4000/health
 docker compose -f Server/docker-compose.yml up -d
 ```
 
-That Compose file uses Postgres 16 and the database name `fashion_brand_showcase`.
+That Compose file uses Postgres 16 and the database name `fashion_brand_showcase`. `npm run db:local` uses the embedded-postgres 18 package instead.
 
 ```sh
 npm run lint          # oxlint, type-aware
