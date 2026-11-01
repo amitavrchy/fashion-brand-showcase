@@ -1,8 +1,10 @@
 # Atelier Lune
 
-Clothing as quiet architecture. A contemporary fashion storefront and the commerce API that serves it: editorial campaigns, shoppable lookbooks, and Stripe test checkout.
+**[Storefront](https://atelier-lune-162.netlify.app)** · **[API](https://atelier-lune-api.onrender.com)** · **[Health](https://atelier-lune-api.onrender.com/health)**
 
-**[Storefront](https://atelier-lune-162.netlify.app)** · **[API](https://atelier-lune-api.onrender.com)** · [health](https://atelier-lune-api.onrender.com/health)
+Clothing as quiet architecture. Editorial campaigns, shoppable lookbooks, and Stripe test checkout, published as a storefront and the commerce API behind it.
+
+Next.js 16 and React 19 render the storefront. NestJS, Prisma, and PostgreSQL run the API.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-111111?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
@@ -12,7 +14,7 @@ Clothing as quiet architecture. A contemporary fashion storefront and the commer
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%20%7C%2018-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Stripe](https://img.shields.io/badge/Stripe-test%20checkout-635BFF?logo=stripe&logoColor=white)](https://docs.stripe.com/testing)
 
-`GET /health` on the API returns `{"status":"ok","service":"atelier-lune"}`. The storefront proxies `/api/*` to that API, so the browser stays on one origin and the session cookie stays HTTP-only. Locally the apps are http://localhost:3000 (admin at `/admin`) and http://127.0.0.1:4000/health.
+[https://atelier-lune-api.onrender.com/health](https://atelier-lune-api.onrender.com/health) returns `{"status":"ok","service":"atelier-lune"}`. The storefront proxies `/api/*` to the API, so the browser stays on one origin and the session cookie stays HTTP-only. The atelier desk is [https://atelier-lune-162.netlify.app/admin](https://atelier-lune-162.netlify.app/admin).
 
 ## Overview
 
@@ -80,7 +82,7 @@ There is no root `package.json`. Shared commands live in `Server/scripts/workspa
 
 ## Getting started
 
-Requires Node.js 22 or newer, and npm. PostgreSQL can be the built-in local server, Docker, or an instance you already run. Only one server should bind `127.0.0.1:5432`.
+Requires Node.js 22 or newer, and npm. PostgreSQL can be the built-in server from `db:local`, Docker, or an instance you already run. Only one server should use the port named in `DATABASE_URL`.
 
 ### Storefront
 
@@ -93,9 +95,9 @@ npm run dev
 
 | Variable | Role |
 | --- | --- |
-| `API_URL` | Server-side origin of the API. Default `http://127.0.0.1:4000`. |
-| `NEXT_PUBLIC_API_URL` | Same origin, available to the browser bundle. |
-| `NEXT_PUBLIC_SITE_URL` | Canonical site URL used for metadata, sitemap, and robots. |
+| `API_URL` | Server-side origin of the API. Published value: `https://atelier-lune-api.onrender.com`. |
+| `NEXT_PUBLIC_API_URL` | Same origin as `API_URL`, available to the browser bundle. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site URL for metadata, sitemap, and robots. Published value: `https://atelier-lune-162.netlify.app`. |
 | `SITE_URL` | Companion site URL. Keep it aligned with `NEXT_PUBLIC_SITE_URL`. |
 
 `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is listed in `.env.example` and can stay empty. Checkout uses a Stripe-hosted redirect, so the secret key lives only on the API.
@@ -104,7 +106,7 @@ npm run dev
 npm run lint          # ESLint
 npx tsc --noEmit      # types (Next.js also typechecks during build)
 npm run build
-npm start             # http://localhost:3000
+npm start             # serves the storefront
 npm run test:e2e      # installs Chromium on first run: npx playwright install chromium
 ```
 
@@ -124,10 +126,10 @@ Set `JWT_SECRET` in `Server/.env` to at least 32 random characters. The example 
 
 | Variable | Role |
 | --- | --- |
-| `DATABASE_URL` | Local default: `postgresql://postgres:postgres@localhost:5432/fashion_brand_showcase?schema=public` |
+| `DATABASE_URL` | Postgres connection string. Set this in `Server/.env`. The Compose database name is `fashion_brand_showcase`. |
 | `JWT_SECRET` | Session signing secret. 32+ random characters. |
-| `PORT` | `4000` |
-| `HOST` | `127.0.0.1` locally. Use `0.0.0.0` in a container. |
+| `PORT` | Port the API listens on. |
+| `HOST` | Bind address. Set `HOST` to `0.0.0.0` in a container. |
 | `CLIENT_ORIGIN` | Exact browser origin allowed by CORS. Comma-separate several. |
 | `STRIPE_SECRET_KEY` | Stripe **test** secret. Leave empty until you exercise checkout. |
 | `STRIPE_WEBHOOK_SECRET` | Written by `npm run stripe:listen` for local forwarding. |
@@ -136,9 +138,9 @@ Set `JWT_SECRET` in `Server/.env` to at least 32 random characters. The example 
 Start a database, then the API:
 
 ```sh
-npm run db:local      # embedded PostgreSQL on 127.0.0.1:5432, data in Server/.data/postgres
+npm run db:local      # embedded PostgreSQL; data in Server/.data/postgres. Point DATABASE_URL at it.
 npm run db:prepare    # prisma migrate deploy, then seed
-npm run start:dev     # http://127.0.0.1:4000/health
+npm run start:dev     # API with reload. Confirm with GET /health.
 ```
 
 `db:local` is optional when PostgreSQL is already running. Docker alternative, from the repository root:
@@ -157,7 +159,7 @@ npm test              # vitest
 npm run test:e2e      # builds, then API tests against a separate *_test database
 ```
 
-Seed an administrator only when `ADMIN_EMAIL` and `ADMIN_PASSWORD` are set. Seeding is idempotent: it does not reset an existing password. Sign in at `/account`, then open `/admin`. For a local-only account with a generated password, `npm run admin:local` writes `Server/.data/admin-access.txt`. That file is gitignored.
+Seed an administrator only when `ADMIN_EMAIL` and `ADMIN_PASSWORD` are set. Seeding is idempotent: it does not reset an existing password. Sign in at [https://atelier-lune-162.netlify.app/account](https://atelier-lune-162.netlify.app/account), then open [https://atelier-lune-162.netlify.app/admin](https://atelier-lune-162.netlify.app/admin). For a generated password on a private database, `npm run admin:local` writes `Server/.data/admin-access.txt`. That file is gitignored.
 
 Stripe test cards and webhook forwarding are documented in [Server/README.md](Server/README.md). Test card `4242 4242 4242 4242` never charges a real card. See [Stripe's testing guide](https://docs.stripe.com/testing).
 
