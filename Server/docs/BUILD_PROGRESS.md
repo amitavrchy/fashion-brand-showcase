@@ -1,7 +1,5 @@
 # ATELIER LUNE implementation
 
-Source of truth: [PROJECT_SPEC.md](PROJECT_SPEC.md).
-
 ## Delivery stages
 
 1. Database schema, curated seed catalog and API foundations.

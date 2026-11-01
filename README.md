@@ -1,127 +1,196 @@
-# ATELIER LUNE
+# Atelier Lune
 
-A complete contemporary fashion storefront built from [PROJECT_SPEC.md](Server/docs/PROJECT_SPEC.md). Next.js 16 / React 19 on the client; NestJS, Prisma and PostgreSQL on the API.
+**[Storefront](https://atelier-lune-162.netlify.app)** · **[API](https://atelier-lune-api.onrender.com)** · **[Health](https://atelier-lune-api.onrender.com/health)**
 
-## Repository layout
+Clothing as quiet architecture. Editorial campaigns, shoppable lookbooks, and Stripe test checkout, published as a storefront and the commerce API behind it.
+
+Next.js 16 and React 19 render the storefront. NestJS, Prisma, and PostgreSQL run the API.
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-111111?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5%20%7C%206-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-12-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%20%7C%2018-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Stripe](https://img.shields.io/badge/Stripe-test%20checkout-635BFF?logo=stripe&logoColor=white)](https://docs.stripe.com/testing)
+
+[https://atelier-lune-api.onrender.com/health](https://atelier-lune-api.onrender.com/health) returns `{"status":"ok","service":"atelier-lune"}`. The storefront proxies `/api/*` to the API, so the browser stays on one origin and the session cookie stays HTTP-only. The atelier desk is [https://atelier-lune-162.netlify.app/admin](https://atelier-lune-162.netlify.app/admin).
+
+## Overview
+
+Atelier Lune is a two-part workspace for a concept fashion house.
+
+**Client** is the public site and the atelier desk. It is a Next.js App Router application: campaigns, collections, product pages, journal, stores, account, bag, and a protected admin.
+
+**Server** is the NestJS API. It owns the catalog, sessions, wishlist, orders, Stripe Checkout, and media uploads, with Prisma on PostgreSQL.
+
+Catalog copy, photography, and boutique locations are concept content. Payments accept Stripe **test** keys only. The app does not fulfil physical orders or send email.
+
+## Key features
+
+- Editorial homepage with a campaign carousel, mega-menu, search, and a saved newsletter address.
+- Eight collections, filters, sort, pagination, and product pages with variants, stock, size guide, and zoom.
+- A bag that persists locally, plus Stripe-hosted test checkout. Prices and stock reservations are decided on the server.
+- Three shoppable lookbooks, a journal, a brand story, and a city-filtered store locator.
+- Accounts with HTTP-only JWT sessions, a wishlist, and order history.
+- An admin for products, collections, campaigns, journal, lookbooks, stores, orders, subscribers, and storefront copy. Uploads are re-encoded to metadata-free WebP.
+- Accessible UI: self-hosted type, a 14px minimum, reduced motion, focus states, and product structured data.
+
+## Tech stack
+
+| | Storefront (`Client`) | API (`Server`) |
+| --- | --- | --- |
+| Runtime | Node.js 22, Next.js 16, React 19 | Node.js 22, NestJS 12 |
+| Language | TypeScript | TypeScript |
+| UI | Tailwind CSS 4, Framer Motion, GSAP, Lenis, Embla | — |
+| Data | Redux Toolkit, React Query, React Hook Form, Zod | Prisma 6, PostgreSQL 16 (Docker) or 18 (`db:local`) |
+| Payments | Hosted Checkout return page | Stripe test mode, signed webhooks |
+| Quality | ESLint, Playwright | oxlint, Vitest |
+
+## Project structure
+
+Application code already lives in two folders. The names are `Client` and `Server` (the storefront and the API). Root holds only files that belong to the repository or to a host that reads them from the repository root.
 
 ```text
-Client/     Storefront, assets, design documentation and browser checks
-Server/     API, database, project documentation and workspace scripts
-README.md   Shared setup and deployment guide
+.
+├── Client/                 Next.js storefront, public images, browser tests
+│   ├── src/                App Router pages, components, and data helpers
+│   ├── public/images/      Campaign and product photography
+│   ├── e2e/                Playwright
+│   ├── docs/               Asset notes
+│   ├── .env.example
+│   └── package.json
+├── Server/                 NestJS API, Prisma schema, local database scripts
+│   ├── src/                HTTP API, auth, catalog, payments, admin
+│   ├── prisma/             Schema, migrations, and seed
+│   ├── scripts/            Local Postgres, Stripe listen, workspace helpers
+│   ├── test/               API end-to-end checks
+│   ├── docs/               Product spec and build notes
+│   ├── Dockerfile          API image
+│   ├── Dockerfile.render   API image with Postgres for Render
+│   ├── .env.example
+│   └── package.json
+├── netlify.toml            Netlify build for the storefront (must stay here)
+├── render.yaml             Render blueprint for the API (must stay here)
+├── .gitignore
+└── README.md
 ```
 
-Each application has its own package manifest, lockfile, environment template and ignore/format configuration. Shared setup and development commands live in `Server/scripts/workspace`; there is no root npm package. Local screenshots and Lighthouse reports are ignored under `Client/.data`, while private payment review artifacts remain ignored under `Server/.data/review/stripe`.
+`netlify.toml` sets the Netlify base directory to `Client`. `render.yaml` points Render at `Server/Dockerfile.render` with `Server` as the Docker context. Moving either file off the repository root would hide it from that host.
 
-## Run locally
+There is no root `package.json`. Shared commands live in `Server/scripts/workspace` and are invoked with `npm --prefix Server`.
 
-Requires Node.js 22+ and npm. From the repository root:
+## Getting started
+
+Requires Node.js 22 or newer, and npm. PostgreSQL can be the built-in server from `db:local`, Docker, or an instance you already run. Only one server should use the port named in `DATABASE_URL`.
+
+### Storefront
 
 ```sh
-npm --prefix Server run setup
+cd Client
+cp .env.example .env.local
+npm ci
+npm run dev
 ```
 
-This installs the locked dependencies, creates missing local environment files and generates a random JWT secret. It preserves existing environment files. If you already have `Server/.env`, ensure `JWT_SECRET` contains at least 32 random characters and is not the example placeholder.
+| Variable | Role |
+| --- | --- |
+| `API_URL` | Server-side origin of the API. Published value: `https://atelier-lune-api.onrender.com`. |
+| `NEXT_PUBLIC_API_URL` | Same origin as `API_URL`, available to the browser bundle. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site URL for metadata, sitemap, and robots. Published value: `https://atelier-lune-162.netlify.app`. |
+| `SITE_URL` | Companion site URL. Keep it aligned with `NEXT_PUBLIC_SITE_URL`. |
 
-Start PostgreSQL in one terminal:
+`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is listed in `.env.example` and can stay empty. Checkout uses a Stripe-hosted redirect, so the secret key lives only on the API.
 
 ```sh
-npm --prefix Server run db:local
+npm run lint          # ESLint
+npx tsc --noEmit      # types (Next.js also typechecks during build)
+npm run build
+npm start             # serves the storefront
+npm run test:e2e      # installs Chromium on first run: npx playwright install chromium
 ```
 
-This runs a real, persistent PostgreSQL server on `127.0.0.1:5432`, stored under `Server/.data/postgres`. It is a local development convenience. Alternatively, use your own PostgreSQL instance or `docker compose -f Server/docker-compose.yml up -d`, and set `DATABASE_URL` in `Server/.env`. Only one database should use port 5432.
+Details: [Client/README.md](Client/README.md).
 
-In another terminal:
+### API
+
+```sh
+cd Server
+cp .env.example .env
+npm install
+```
+
+`npm ci` in `Server` fails on npm 10: the lockfile does not record the optional peer `magicast@0.3.5`. `npm install` matches the Render image (`Dockerfile.render`) and is the install to use. `npm --prefix Server run setup` copies missing env files and then runs `npm ci` in both apps, so prefer the commands in this section.
+
+Set `JWT_SECRET` in `Server/.env` to at least 32 random characters. The example placeholder is rejected on startup.
+
+| Variable | Role |
+| --- | --- |
+| `DATABASE_URL` | Postgres connection string. Set this in `Server/.env`. The Compose database name is `fashion_brand_showcase`. |
+| `JWT_SECRET` | Session signing secret. 32+ random characters. |
+| `PORT` | Port the API listens on. |
+| `HOST` | Bind address. Set `HOST` to `0.0.0.0` in a container. |
+| `CLIENT_ORIGIN` | Exact browser origin allowed by CORS. Comma-separate several. |
+| `STRIPE_SECRET_KEY` | Stripe **test** secret. Leave empty until you exercise checkout. |
+| `STRIPE_WEBHOOK_SECRET` | Written by `npm run stripe:listen` for local forwarding. |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional one-time seed of an administrator. Password at least 12 characters. No default account exists. |
+
+Start a database, then the API:
+
+```sh
+npm run db:local      # embedded PostgreSQL; data in Server/.data/postgres. Point DATABASE_URL at it.
+npm run db:prepare    # prisma migrate deploy, then seed
+npm run start:dev     # API with reload. Confirm with GET /health.
+```
+
+`db:local` is optional when PostgreSQL is already running. Docker alternative, from the repository root:
+
+```sh
+docker compose -f Server/docker-compose.yml up -d
+```
+
+That Compose file uses Postgres 16 and the database name `fashion_brand_showcase`. `npm run db:local` uses the embedded-postgres 18 package instead.
+
+```sh
+npm run lint          # oxlint, type-aware
+npm run build         # nest build (tsc)
+npm run start:prod    # node dist/main.js — needs a reachable DATABASE_URL
+npm test              # vitest
+npm run test:e2e      # builds, then API tests against a separate *_test database
+```
+
+Seed an administrator only when `ADMIN_EMAIL` and `ADMIN_PASSWORD` are set. Seeding is idempotent: it does not reset an existing password. Sign in at [https://atelier-lune-162.netlify.app/account](https://atelier-lune-162.netlify.app/account), then open [https://atelier-lune-162.netlify.app/admin](https://atelier-lune-162.netlify.app/admin). For a generated password on a private database, `npm run admin:local` writes `Server/.data/admin-access.txt`. That file is gitignored.
+
+Stripe test cards and webhook forwarding are documented in [Server/README.md](Server/README.md). Test card `4242 4242 4242 4242` never charges a real card. See [Stripe's testing guide](https://docs.stripe.com/testing).
+
+### Both applications
+
+With Postgres running and `Server/.env` in place:
 
 ```sh
 npm --prefix Server run db:prepare
 npm --prefix Server run dev:all
 ```
 
-- Storefront: http://localhost:3000
-- API health: http://127.0.0.1:4000/health
-- Admin: http://localhost:3000/admin
+`dev:all` starts the API watcher and `next dev` together. `npm --prefix Server run build:all` builds the API and then the storefront.
 
-The current review preview runs at **http://localhost:3001** because port 3000 is occupied. To use that port yourself, run `npm --prefix Client run dev -- --port 3001` and include `http://localhost:3001` in `CLIENT_ORIGIN`.
+## Production
 
-The Next.js server proxies `/api/*` to the API, so session cookies stay HTTP-only and same-origin. `API_URL` is a server-side environment variable. `CLIENT_ORIGIN` on the API is the exact allowed browser origin (comma-separated if several are required).
+The storefront and API are already published. `netlify.toml` and `render.yaml` stay at the repository root: Netlify reads the toml from the root, and the Render service uses an empty Root Directory.
 
-## Administrator access
+**Storefront — Netlify.** [atelier-lune-162.netlify.app](https://atelier-lune-162.netlify.app). `netlify.toml` builds `Client` with Node 22 (`npm ci && npm run build`) and the Next.js runtime plugin. The Netlify base directory is `Client` (set in the toml). Leave the UI base directory empty; setting it to `Client` as well stacks the path. For a production build, set:
 
-The requested local administrator has been provisioned for this review. Open the ignored **`Server/.data/admin-access.txt`** file for its generated sign-in details, sign in at `/account`, then visit `/admin`. Credentials are never committed or printed in setup logs.
+- `API_URL` = `https://atelier-lune-api.onrender.com`
+- `NEXT_PUBLIC_SITE_URL` = `https://atelier-lune-162.netlify.app`
 
-On a fresh local database, `npm --prefix Server run admin:local` creates an administrator with a random password and writes that private local file. It only accepts a local development database and leaves any existing administrator unchanged.
+**API — Render.** [atelier-lune-api.onrender.com](https://atelier-lune-api.onrender.com). `render.yaml` defines the Docker web service `atelier-lune-api` in Oregon. Root Directory stays empty. The blueprint builds `Server/Dockerfile.render` with Docker context `Server`. Set `CLIENT_ORIGIN` in the Render dashboard to `https://atelier-lune-162.netlify.app` (`sync: false` in the blueprint). `JWT_SECRET` and `JWT_REFRESH_SECRET` are generated by Render. The bundled Postgres password in that blueprint is for the free single-container preview; put a managed database and a strong secret in front of any public launch.
 
-There are no default administrator credentials. Add `ADMIN_EMAIL` and `ADMIN_PASSWORD` (at least 12 characters) to your ignored `Server/.env`, then run:
+Also set `NODE_ENV=production`. Session cookies require HTTPS. Uploaded images default to `.data/uploads` (Docker: `/app/.data/uploads`) and need durable storage. The in-memory rate limiter is for one instance.
 
-```sh
-npm --prefix Server run db:seed
-```
+## Author
 
-Sign in through `/account`, then open `/admin`. Seeding is idempotent and preserves existing catalog edits. It creates an administrator only if that email does not already exist; it never promotes an existing customer or resets a password. Remove the provisioning variables after creating the account.
+[Amitav Roy Chowdhury](https://github.com/amitavrchy)
 
-## What works
+## License
 
-- Editorial campaign carousel, responsive mega-menu, material-aware search and newsletter persistence.
-- Collections with URL-backed category, color, available-size filters, sorting and pagination.
-- A new coastal campaign with dedicated desktop/mobile photography, intrinsic image proportions without letterbox backgrounds, 24 distinct garment photographs, zoom, keyboard-accessible variants, size guide, stock states and fabric/care accordions. Secondary-image hover is supported when administrators add another product view.
-- Redux bag with local persistence, editable quantities and a focus-trapped drawer.
-- Stripe-hosted test checkout, authoritative server prices, shipping calculation, stable retry keys and transactional stock reservations. Verified payment confirms the order; cancellation/expiry releases stock exactly once.
-- Three shoppable lookbooks with thirteen chapters, GSAP horizontal desktop navigation, touch-friendly mobile chapters and product panels. Hotspots stay aligned with the complete photograph.
-- Brand story, journal filtering/articles and city-filtered store locator with map directions.
-- Registration/sign-in, HTTP-only JWT sessions, persistent authenticated wishlist and account order history.
-- Nine protected management sections: products/variants, collections, desktop/mobile campaigns, journal publishing/scheduling, lookbooks with reorderable chapters and clickable product points, stores, order details and fulfilment, subscriber CSV export, and storefront settings. Product unpublishing preserves order history.
-- Image uploads validate and re-encode JPEG/PNG/WebP photographs, strip metadata, preserve complete proportions and save to persistent local media storage. Storefront settings control the announcement, homepage introduction, newsletter and contact email.
-- Self-hosted fonts, a 14px minimum UI text size, reduced-motion support, focus states, native accessible dialogs, product JSON-LD, metadata, sitemap and robots rules.
-- 24 pieces across eight collections, twelve journal stories, six concept boutiques, material guides, wardrobe advice, brand stories and detailed care/service answers.
-
-## Stripe test payments
-
-Set `STRIPE_SECRET_KEY` to your Stripe **test** secret key in ignored `Server/.env`. Existing keys are preserved. Hosted Checkout handles card entry; the application never receives card numbers, and a publishable key is not needed for this redirect flow.
-
-Keep the local webhook forwarder running in its own terminal **before starting the API**:
-
-```sh
-npm --prefix Server run stripe:listen
-```
-
-The wrapper uses the configured test key without printing it, forwards Checkout events to `http://127.0.0.1:4000/payments/webhook`, and saves the signing secret only to ignored `Server/.env`. Restart the API after the first connection or if that secret changes. No Stripe CLI login is required with the configured API key.
-
-Complete checkout with Stripe test card `4242 4242 4242 4242`, any future expiry, and any three-digit CVC. Card `4000 0000 0000 0002` exercises a declined payment. Use fictitious customer details. No real money is charged. See [Stripe's testing guide](https://docs.stripe.com/testing).
-
-The return page verifies the session with Stripe before showing success. Signed webhooks and periodic reconciliation also update orders when the browser closes. Receipt access requires the checkout browser's HTTP-only cookie or the owning account. Abandoned reservations expire after about 31 minutes and are reconciled every minute. Cancelling Checkout returns to a usable bag.
-
-The storefront displays one compact test-payment notice on checkout. Confirmation pages use normal order language; test-card instructions are kept in developer documentation.
-
-## Verification
-
-Run PostgreSQL first. Integration and browser tests create separate databases ending in `_test`; they do not submit test orders to the development catalog. The configured database user must be able to create these test databases, or provision them beforehand.
-
-```sh
-npm --prefix Server run test:e2e
-npm --prefix Client exec -- playwright install chromium
-npm --prefix Client run test:e2e
-```
-
-The browser suite starts its own API on port 4002 and Next.js on port 3003, using a separate `.next-test` directory. Its dedicated browser test database is reset when the test server starts. The test-only administrator credentials in the browser fixture are never provisioned in the development database. Automated suites inject a fake Stripe gateway in the test bootstrap, verify signed fixture events and never spend real funds or require Stripe credentials. The production application has no fixture payment endpoints. Real Stripe test-card payment, signed local webhook, decline and cancellation are also checked separately.
-
-```sh
-npm --prefix Server run build:all
-npm --prefix Client run lint
-npm --prefix Server run lint
-```
-
-Verification results are recorded in [BUILD_PROGRESS.md](Server/docs/BUILD_PROGRESS.md). Run `npm --prefix Client run audit` against a running production preview to write a fresh HTML/JSON Lighthouse report to `Client/.data/quality/`; set `AUDIT_URL` when the preview uses port 3001. Scores depend on the deployment environment.
-
-## Production configuration
-
-Use managed PostgreSQL, apply `npm --prefix Server run db:migrate`, provision an administrator deliberately, and configure a strong `JWT_SECRET`. Set `NODE_ENV=production`, `HOST=0.0.0.0` when binding inside a container, `CLIENT_ORIGIN` to the HTTPS storefront origin, and `API_URL` on Next.js to the API origin. Set `NEXT_PUBLIC_SITE_URL` before the client build for canonical social and sitemap URLs. Production session cookies require HTTPS.
-
-Build with `npm --prefix Server run build:all`; start each service with `npm --prefix Server run start:prod` and `npm --prefix Client start`. The API Dockerfile is built with `Server` as its context. Never expose the development database or its example credentials to the public internet.
-
-Keep uploaded photography on durable storage. `MEDIA_DIRECTORY` defaults to `.data/uploads` under the server working directory; the Docker image uses `/app/.data/uploads` as a writable volume. Back up this directory with PostgreSQL, or supply your deployment's persistent media path. Deleting an editorial entry does not delete an uploaded file that another entry may still use.
-
-Payments currently accept Stripe test keys only. For a deployed test environment, configure a Stripe endpoint at `https://<your-api>/payments/webhook` for `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`, and set that endpoint's `STRIPE_WEBHOOK_SECRET`. The CLI secret belongs only to local forwarding. Live charging requires an intentional production payment rollout.
-
-The application records test orders without arranging physical fulfilment or sending transactional emails. Newsletter signup persists the address; connecting an email provider is a future integration. Store locations, brand history and product imagery are concept content. Replace them with verified brand information before commercial launch. Asset provenance and generated campaign prompts are in [ASSETS.md](Client/docs/ASSETS.md).
-
-The in-memory API rate limiter is suitable for a single instance. A multi-instance deployment should share rate-limit storage and configure proxy trust for its infrastructure.
+No `LICENSE` file is included. `Server/package.json` is `"license": "UNLICENSED"`. All rights reserved.

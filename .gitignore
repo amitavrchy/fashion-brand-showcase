@@ -1,2 +1,4 @@
 # Local Netlify folder
 .netlify
+config.bat
+node_modules

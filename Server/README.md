@@ -42,4 +42,4 @@ npm run build:all
 npm run test:all
 ```
 
-`setup` installs both applications and creates only missing local environment files. The `:all` commands coordinate both folders; the normal API build/start commands remain independent for deployment. Project specifications and verification notes are in [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) and [docs/BUILD_PROGRESS.md](docs/BUILD_PROGRESS.md).
+`setup` installs both applications and creates only missing local environment files. The `:all` commands coordinate both folders; the normal API build/start commands remain independent for deployment. Verification notes are in [docs/BUILD_PROGRESS.md](docs/BUILD_PROGRESS.md).
